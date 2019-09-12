@@ -6,7 +6,7 @@
 /*   By: ozhyhadl <ozhyhadl@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/08/19 13:40:05 by apavlov           #+#    #+#             */
-/*   Updated: 2019/09/11 21:49:48 by ozhyhadl         ###   ########.fr       */
+/*   Updated: 2019/09/12 23:00:07 by ozhyhadl         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ void	make_little_default_scene(t_scene *scene)
 	scene->obj[0].trans = (cl_double)0;
 	scene->obj[0].ior = (cl_double)1.4;
 	scene->obj[0].text_no = 0;
+	scene->obj[0].normal_map_no = 1;
 
 	scene->obj[1].fig_type = (cl_int)SPHERE;
 	scene->obj[1].shape.sphere.cent = (cl_double3){{0, 0, 5}};
@@ -61,43 +62,24 @@ void	make_little_default_scene(t_scene *scene)
 	scene->obj[1].trans = (cl_double)0.1;
 	scene->obj[1].ior = (cl_double)1;
 	scene->obj[1].text_no = 0;
+	scene->obj[1].normal_map_no = -1;	
 }
 
-void	init_pov(t_pov *pov)
-{
-	pov->d = D;
-	pov->vw = VW;
-	pov->vh = VH;
-
-	pov->cx = cos(0);
-	pov->sx = sin(0);
-	pov->cy = cos(0);
-	pov->sy = sin(0);
-
-	pov->coord = (cl_double3){{0, 0, 0}};
-}
 
 int		main(int argc, char **argv)
 {
 	t_rt	rt;
 
-	if (init_sdl(&rt.sdl))
+	if (init_start_params(&rt))
+		return (error_message(RED"couldnt init params"COLOR_OFF));
+	if (init_sdl(&rt.sdl, rt.pov.w, rt.pov.h))
 		return (1);
-
-	rt.envi.txt_count = 1;
-	rt.envi.txt = read_texture("envi/8k_earth_daymap.jpg", &rt.envi.txt_par);
-	rt.envi.bump = read_texture("envi/earth_bump_map.jpg", &rt.envi.bump_par);
-	printf("%i %i\n", rt.envi.bump_par.w, rt.envi.bump_par.h);
-	if (rt.envi.txt == 0)
-		return (error_message(RED"texture failure"COLOR_OFF));
-	if (rt.envi.bump == 0)
-		return (error_message(RED"texture failure"COLOR_OFF));
-	
+	if (read_textures(&rt))
+		return (1);
 	if (init_cl(&rt.cl))
 		return (1);
 	if (create_program_and_kernels(&rt.cl))
 		return (1);
-	init_pov(&rt.pov);
 	make_little_default_scene(&rt.scene);
 
 	// if (ft_parse_xml(argv[1], &rt.scene, &rt.pov))
@@ -107,7 +89,7 @@ int		main(int argc, char **argv)
 	if (set_up_memory(&rt, &rt.cl))
 		return (1);
 	there_will_be_loop(&rt);
-	// ft_xml_save("sss.xml", &rt.scene, &rt.pov);
+	// ft_xml_save("sss.xml", &rt.scene, rt.pov);
 	close_sdl(&rt.sdl);
 	freed_up_memory(&rt.cl);
 	return (0);

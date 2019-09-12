@@ -6,7 +6,7 @@
 /*   By: ozhyhadl <ozhyhadl@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/08/26 16:47:05 by ozhyhadl          #+#    #+#             */
-/*   Updated: 2019/09/11 19:32:42 by ozhyhadl         ###   ########.fr       */
+/*   Updated: 2019/09/12 20:18:45 by ozhyhadl         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ static void	ft_create_all(t_scene *scene, int i)
 	scene->obj[i].reflective = (cl_double)0;
 	scene->obj[i].trans = (cl_double) 0;
 	scene->obj[i].text_no = -1;
+	scene->obj[i].normal_map_no = -1;
 }
 
 void		ft_create_spher(t_scene *scene, int i)

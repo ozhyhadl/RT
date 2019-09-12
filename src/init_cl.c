@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init_cl.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: apavlov <apavlov@student.unit.ua>          +#+  +:+       +#+        */
+/*   By: apavlov <apavlov@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/08/19 15:02:32 by apavlov           #+#    #+#             */
-/*   Updated: 2019/08/19 15:02:33 by apavlov          ###   ########.fr       */
+/*   Updated: 2019/09/12 16:08:43 by apavlov          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,7 @@ int			create_program_and_kernels(t_cl *cl)
 		return (error_message(RED"color_managment.cl problem"COLOR_OFF));
 	if (read_file("./src/cl/other_function.cl", source_str + 4))
 		return (error_message(RED"color_managment.cl problem"COLOR_OFF));
-		if (read_file("./src/cl/textures_and_bump.cl", source_str + 5))
+	if (read_file("./src/cl/textures_and_bump.cl", source_str + 5))
 		return (error_message(RED"color_managment.cl problem"COLOR_OFF));
 
 	cl->program = clCreateProgramWithSource(cl->context, 6, \
@@ -92,7 +92,10 @@ int			create_program_and_kernels(t_cl *cl)
 		
 	cl->rt_kernel = clCreateKernel(cl->program, "test_kernel", &ret);
 	if (ret != CL_SUCCESS)
-		return (error_message(RED"clCreateKernel exception"COLOR_OFF));
+		return (error_message(RED"clCreateKernel test_kernel exception"COLOR_OFF));
+	cl->click_kernel = clCreateKernel(cl->program, "click_kernel", &ret);
+	if (ret != CL_SUCCESS)
+		return (error_message(RED"clCreateKernel click_kernel exception"COLOR_OFF));
 	return (0);
 }
 
@@ -109,52 +112,61 @@ int			set_global_and_local_item_size(t_cl *cl)
 		cl->local_size--;
 	return (0);
 }
-//
-int			set_up_memory(t_rt *rt, t_cl *cl) //how to use buffer to direct change rt.sdl.win_sur->pixels
+
+int			set_up_memory(t_rt *rt, t_cl *cl)
 {
 	cl_int	ret;
 
-	cl->pixels_to_read_into = (cl_uint*)malloc(sizeof(cl_uint) * WIN_HEIGHT * WIN_WIDTH);
-	cl->scene_mem = clCreateBuffer(cl->context, CL_MEM_READ_ONLY | CL_MEM_HOST_WRITE_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(t_scene), &rt->scene, &ret);
+	cl->scene_mem = clCreateBuffer(cl->context, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, sizeof(t_scene), &rt->scene, &ret);
 	if (ret != CL_SUCCESS)
 		return (error_message(RED"clCreateBuffer(scene_mem) exception"COLOR_OFF));
 	cl->pixel_ptr = clCreateBuffer(cl->context, CL_MEM_WRITE_ONLY | CL_MEM_HOST_READ_ONLY, sizeof(cl_uint) * WIN_HEIGHT * WIN_WIDTH, 0, &ret);
 	if (ret != CL_SUCCESS)
 		return (error_message(RED"clCreateBuffer(pixel_ptr) exception"COLOR_OFF));
-	cl->texture_mem = clCreateBuffer(cl->context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, \
-							sizeof(cl_uint) * rt->envi.txt_par.w * rt->envi.txt_par.h, rt->envi.txt, &ret);
+	cl->texture_mem = clCreateBuffer(cl->context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(cl_uint) * rt->envi.textures_size, rt->envi.txt, &ret);
 	if (ret != CL_SUCCESS)
 		return (error_message(RED"clCreateBuffer(texture_mem) exception"COLOR_OFF));
-	cl->bump_mem = clCreateBuffer(cl->context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, \
-							sizeof(cl_uint) * rt->envi.bump_par.w * rt->envi.bump_par.h, rt->envi.bump, &ret);
+	cl->txt_param_mem = clCreateBuffer(cl->context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(t_txt_params) * rt->envi.txt_count, rt->envi.txt_par, &ret);
 	if (ret != CL_SUCCESS)
-		return (error_message(RED"clCreateBuffer(bump_mem) exception"COLOR_OFF));
+		return (error_message(RED"clCreateBuffer(texture_mem) exception"COLOR_OFF));
+	
+	//mem obj for id click
+	cl->id_obj = clCreateBuffer(cl->context, CL_MEM_WRITE_ONLY | CL_MEM_HOST_READ_ONLY, sizeof(int), 0, &ret);
+	if (ret != CL_SUCCESS)
+		return (error_message(RED"clCreateBuffer(texture_mem) exception"COLOR_OFF));
 
+	//should i set another local and global size for second kernel?
 	ret = set_global_and_local_item_size(cl);
 	if (ret != CL_SUCCESS)
 		return (1);
 
+	/* Argument list for test_kernel*/
 	ret = clSetKernelArg(cl->rt_kernel, 0, sizeof(cl->scene_mem), &cl->scene_mem);
 	if (ret != CL_SUCCESS)
 		return (error_message(RED"clSetKernelArg(0) exception"COLOR_OFF));
 	ret = clSetKernelArg(cl->rt_kernel, 1, sizeof(cl->pixel_ptr), &cl->pixel_ptr);
 	if (ret != CL_SUCCESS)
 		return (error_message(RED"clSetKernelArg(1) exception"COLOR_OFF));
-	ret = clSetKernelArg(cl->rt_kernel, 2, sizeof(rt->sdl.win_sur->w), &rt->sdl.win_sur->w);
+	ret = clSetKernelArg(cl->rt_kernel, 2, sizeof(rt->pov), &rt->pov);
 	if (ret != CL_SUCCESS)
 		return (error_message(RED"clSetKernelArg(2) exception"COLOR_OFF));
-	ret = clSetKernelArg(cl->rt_kernel, 3, sizeof(rt->sdl.win_sur->h), &rt->sdl.win_sur->h);
+	ret = clSetKernelArg(cl->rt_kernel, 3, sizeof(cl->texture_mem), &cl->texture_mem);
 	if (ret != CL_SUCCESS)
 		return (error_message(RED"clSetKernelArg(3) exception"COLOR_OFF));
-	ret = clSetKernelArg(cl->rt_kernel, 4, sizeof(rt->pov), &rt->pov);
+	ret = clSetKernelArg(cl->rt_kernel, 4, sizeof(cl->txt_param_mem), &cl->txt_param_mem);
 	if (ret != CL_SUCCESS)
 		return (error_message(RED"clSetKernelArg(4) exception"COLOR_OFF));
-	ret = clSetKernelArg(cl->rt_kernel, 5, sizeof(cl->texture_mem), &cl->texture_mem);
+
+	/* Argument list for click_kernel*/
+	ret = clSetKernelArg(cl->click_kernel, 0, sizeof(cl->scene_mem), &cl->scene_mem);
 	if (ret != CL_SUCCESS)
-		return (error_message(RED"clSetKernelArg(5) exception"COLOR_OFF));
-	ret = clSetKernelArg(cl->rt_kernel, 6, sizeof(cl->bump_mem), &cl->bump_mem);
+		return (error_message(RED"clSetKernelArg(0) exception"COLOR_OFF));
+	ret = clSetKernelArg(cl->click_kernel, 3, sizeof(rt->pov), &rt->pov);
 	if (ret != CL_SUCCESS)
-		return (error_message(RED"clSetKernelArg(6) exception"COLOR_OFF));
+		return (error_message(RED"clSetKernelArg(3) exception"COLOR_OFF));
+	ret = clSetKernelArg(cl->click_kernel, 4, sizeof(cl->id_obj), &cl->id_obj);
+	if (ret != CL_SUCCESS)
+		return (error_message(RED"clSetKernelArg(4) exception"COLOR_OFF));
 	return (0);
 }
 
@@ -171,6 +183,8 @@ int			freed_up_memory(t_cl *cl)
 	ret = clReleaseMemObject(cl->texture_mem);
 	if (ret != CL_SUCCESS)
 		error_message(RED"clReleaseMemObject(texture_mem) exception but whatever"COLOR_OFF);
-	free(cl->pixels_to_read_into);
+	ret = clReleaseMemObject(cl->txt_param_mem);
+	if (ret != CL_SUCCESS)
+		error_message(RED"clReleaseMemObject(cl->txt_param_mem) exception but whatever"COLOR_OFF);
 	return (0);
 }

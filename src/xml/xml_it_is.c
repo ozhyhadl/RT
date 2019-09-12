@@ -6,7 +6,7 @@
 /*   By: ozhyhadl <ozhyhadl@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/01 16:48:30 by ozhyhadl          #+#    #+#             */
-/*   Updated: 2019/09/11 20:35:53 by ozhyhadl         ###   ########.fr       */
+/*   Updated: 2019/09/12 22:55:12 by ozhyhadl         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,6 @@ int	ft_is_cam(mxml_node_t *node, t_pov *pov, int what_is)
 int	ft_is_light(mxml_node_t *node, t_scene *scene, int l, int what_is)
 {
 	const char	*name;
-	cl_double	one_dot;
 	cl_double3	dot;
 
 	if (what_is != 2)

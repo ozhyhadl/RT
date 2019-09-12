@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   kernel.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ozhyhadl <ozhyhadl@student.42.fr>          +#+  +:+       +#+        */
+/*   By: apavlov <apavlov@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/08/20 15:41:32 by apavlov           #+#    #+#             */
-/*   Updated: 2019/09/11 17:01:38 by ozhyhadl         ###   ########.fr       */
+/*   Updated: 2019/09/12 16:06:06 by apavlov          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,6 +92,8 @@ typedef struct	s_pov
 	double		d;
 	double		vh;
 	double		vw;
+	int			w;
+	int			h;
 }				t_pov;
 
 typedef struct	s_raytrace_tree
@@ -124,12 +126,19 @@ typedef struct	s_scene
 	t_light		light[MAX_LIGHTING_COUNT];
 }				t_scene;
 
+typedef struct	s_txt_params
+{
+	int		w;
+	int		h;
+	int		start_pos;
+}				t_txt_params;
+
 //main stuff
-double3		ray_trace(double3 eye, double3 dir, __global t_scene *scene, double min_range, double max_range, __global uint *texture, __global uint *bump);
+double3		ray_trace(double3 eye, double3 dir, __global t_scene *scene, double min_range, double max_range, __global uint *texture, __global t_txt_params *txt_params);
 double3		canvas_to_viewport(int x, int y, int w, int h, t_pov pov);
 double3		calculate_light(__global t_scene *scene, double3 eye, \
 						double3 dir, double3 normal, double3 intersect_point, \
-						t_fig	fig, __global uint *bump_map, __global uint *texture);
+						t_fig fig, __global uint *texture, __global t_txt_params *txt_params);
 
 
 
@@ -167,7 +176,7 @@ uint		color_to_canvas(double3 color);
 
 //texture staff
 double2		cartesian_to_sperical_coords(double3 intersect_point, t_fig data);
-uint		get_texture_pixel(double2 coord, __global uint *texture, int no); //pass the global_param_for_each_texture
+uint	get_texture_pixel(double2 coord, __global uint *texture, t_txt_params params, int no);
 
 //other functions
 void		swap(double* a, double*b);

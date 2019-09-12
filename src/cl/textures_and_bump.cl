@@ -20,12 +20,12 @@ double2	cartesian_to_sperical_coords(double3 intersect_point, t_fig data)
 	return ((double2)(s, t));
 }
 
-uint	get_texture_pixel(double2 coord, __global uint *texture, int no)
+uint	get_texture_pixel(double2 coord, __global uint *texture, t_txt_params params, int no)
 {
 	int			is;
 	int			it;
 
-	is = coord[0] * 4095;
-	it = coord[1] * 8191;
-	return (texture[is * 8192 + it]);
+	is = coord[0] * params.h - 1;
+	it = coord[1] * params.w - 1;
+	return (texture[params.start_pos + is * params.w + it]);
 }

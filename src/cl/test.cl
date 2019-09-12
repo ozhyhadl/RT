@@ -91,7 +91,7 @@ double3	get_intersity_after_shadow_rays(double3 intersect_point, double3 light_d
 
 double3	calculate_light(__global t_scene *scene, double3 eye, \
 						double3 dir, double3 normal, double3 intersect_point, \
-						t_fig fig, __global uint *bump_map, __global uint *texture)
+						t_fig fig, __global uint *texture, __global t_txt_params *txt_params)
 {
 	int		i;
 	__global t_light	*light;
@@ -102,23 +102,23 @@ double3	calculate_light(__global t_scene *scene, double3 eye, \
 	double3	reflect_ray;
 	double3	local_intensity;
 
-	double2 texture_space_coords = cartesian_to_sperical_coords(intersect_point, fig);
+	double2 texture_space_coords = cartesian_to_sperical_coords(intersect_point, fig); //get no of texture coordinates for sphere
+	double3	new_normal = normal;
 
-	// double3	n = normalize(intersect_point - scene->obj[closest_obj].shape.sphere.cent);
-	// double3	A = (double3)(1, 0, 0);
-	// double3	t = normalize(cross(A, n));
-	// double3 b = normalize(cross(n, t));
-	// int		is = texture_space_coords[0] * 1023;
-	// int		it = texture_space_coords[1] * 2047;
-	// double3	normal_from_map = uint_to_double3(bump_map[is * 2048 + it]); //replace with get_texture_pixel
-	// double3 du = normal_from_map[0] / 255 * 2 - 1;
-	// double3 dv = normal_from_map[1] / 255 * 2 - 1;
+	if (fig.normal_map_no > -1) //bump mapping for sphere
+	{
+		double3	A = (double3)(1, 0, 0);
+		double3	t = normalize(cross(A, normal));
+		double3 b = normalize(cross(normal, t));
+		double3	normal_from_map = uint_to_double3(get_texture_pixel(texture_space_coords, texture, txt_params[fig.normal_map_no], fig.normal_map_no));
+		double3 du = normal_from_map[0] / 255 * 2 - 1;
+		double3 dv = normal_from_map[1] / 255 * 2 - 1;
+		new_normal = normalize(normal - du * t + dv * b); //could be changes from + to -
+	}
 
-	// double3	new_normal = normalize(n + du * t + dv * b);
-	
 	double3	pix_color;
 	if (fig.text_no > -1)
-	 	pix_color = uint_to_double3(get_texture_pixel(texture_space_coords, texture, fig.text_no));
+	 	pix_color = uint_to_double3(get_texture_pixel(texture_space_coords, texture, txt_params[fig.text_no], fig.text_no));
 	else
 		pix_color = fig.color;
 
@@ -145,25 +145,22 @@ double3	calculate_light(__global t_scene *scene, double3 eye, \
 			/*blicks*/
 			if (fig.specular > 0)
 			{						
-				reflect_ray = reflected_ray(normal, light_dir);
+				reflect_ray = reflected_ray(new_normal, light_dir);
 				scalar = dot(reflect_ray, -dir);
 				if (scalar > 0)
 					intensity += local_intensity * pow(scalar / (length(-dir) * length(reflect_ray)), fig.specular);
 			}
 			/*brightness*/
-			// scalar = dot(new_normal, light_dir);
-			// if (scalar > 0)
-			// 	intensity += (local_intensity * scalar / (length(light_dir) * length(new_normal)));
-			scalar = dot(normal, light_dir);
+			scalar = dot(new_normal, light_dir);
 			if (scalar > 0)
-				intensity += (local_intensity * scalar / (length(light_dir) * length(normal)));
+				intensity += (local_intensity * scalar / (length(light_dir) * length(new_normal)));
 			
 		}
 	}
 	return (pix_color * intensity);
 }
 
-double3		ray_trace(double3 eye, double3 dir, __global t_scene *scene, double min_range, double max_range, __global uint *texture, __global uint *bump)
+double3		ray_trace(double3 eye, double3 dir, __global t_scene *scene, double min_range, double max_range, __global uint *texture, __global t_txt_params *txt_params)
 {
 	double3		normal;
 	double3		local_color;
@@ -200,7 +197,7 @@ double3		ray_trace(double3 eye, double3 dir, __global t_scene *scene, double min
 			//--------------------
 
 			//get local color value
-			local_color = calculate_light(scene, curr_node.start, curr_node.dir, normal, intersect_point, fig, bump, texture);
+			local_color = calculate_light(scene, curr_node.start, curr_node.dir, normal, intersect_point, fig, texture, txt_params);
 
 			//mix color and go deeper
 			local_color *= curr_node.part_of_primary_ray;
@@ -253,21 +250,19 @@ double3	canvas_to_viewport(int x, int y, int w, int h, t_pov pov)
 
 __kernel void	test_kernel(__global t_scene *scene,
 							__global uint *canvas,
-							int w,
-							int h,
 							t_pov pov,
 							__global uint *texture,
-							__global uint *bump_map)
+							__global t_txt_params *txt_params)
 {
 	int	id = get_global_id(0);
-	int	x = id % w;
-	int	y = id / w;
+	int	x = id % pov.w;
+	int	y = id / pov.w;
 	double3	direction;
 	double3	color;
 
-	direction = normalize(canvas_to_viewport(x - w /2 , y - h / 2, w, h, pov));
+	direction = normalize(canvas_to_viewport(x - pov.w /2 , y - pov.h / 2, pov.w, pov.h, pov));
 	direction = rotate_camera(direction, pov);
-	color = ray_trace(pov.coord, direction, scene, 0.1, BIG_VALUE, texture, bump_map);
+	color = ray_trace(pov.coord, direction, scene, 0.1, BIG_VALUE, texture, txt_params);
 	color = trim_color(color);
 	
 	canvas[id] = color_to_canvas(color);

@@ -3,21 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   init_sdl.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: apavlov <apavlov@student.unit.ua>          +#+  +:+       +#+        */
+/*   By: apavlov <apavlov@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/08/19 15:02:46 by apavlov           #+#    #+#             */
-/*   Updated: 2019/08/19 15:02:46 by apavlov          ###   ########.fr       */
+/*   Updated: 2019/09/12 16:10:06 by apavlov          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/rt.h"
 
-int			init_sdl(t_sdl *sdl)
+int			init_sdl(t_sdl *sdl, int w, int h)
 {
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
 		return (error_message((char *)SDL_GetError()));
 	if (!(sdl->win = SDL_CreateWindow("RT", SDL_WINDOWPOS_CENTERED, \
-		SDL_WINDOWPOS_CENTERED, WIN_WIDTH, WIN_HEIGHT, SDL_WINDOW_SHOWN)))
+		SDL_WINDOWPOS_CENTERED, w, h, SDL_WINDOW_SHOWN)))
 		return (error_message((char *)SDL_GetError()));
 	if (!(sdl->win_sur = SDL_GetWindowSurface(sdl->win)))
 		return (error_message((char *)SDL_GetError()));

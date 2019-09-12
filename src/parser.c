@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: apavlov <apavlov@student.unit.ua>          +#+  +:+       +#+        */
+/*   By: apavlov <apavlov@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/08/19 16:54:35 by apavlov           #+#    #+#             */
-/*   Updated: 2019/08/19 16:54:35 by apavlov          ###   ########.fr       */
+/*   Updated: 2019/09/12 15:42:09 by apavlov          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,27 +61,64 @@ SDL_Surface	*load_tex(char *path, Uint32 format)
 	return (texture);
 }
 
-cl_uint	*read_texture(char	*file_name, t_txt_params *params)
+/*
+	really bad implamantaion of realloc if new_size is less then current would be seg
+	for improvement follow "man malloc_size" or google for it
+				size_t malloc_size(const void *ptr);
+
+	...also could copy per machine word not a single byte
+*/
+
+void	*ft_realloc(void *p, size_t new_size, size_t prev_size)
+{
+	unsigned char	*res;
+	unsigned char	*copy_of_p;
+	size_t	i;
+
+	res = 0;
+	res = ft_memalloc(new_size);
+	if (!res)
+		return (0);
+	if (!p)
+		return (res);
+	copy_of_p = (unsigned char*)p;
+	i = -1;
+	if (prev_size > new_size)
+		prev_size = new_size;
+	while (++i < prev_size)
+		res[i] = copy_of_p[i];
+	return ((void*)res);
+}
+
+int		read_texture(char	*file_name, t_envi *envi)
 {
 	SDL_Surface	*surr;
-	cl_uint		*res;
+	cl_uint		*tmp;
 	Uint8		*pixels;
-	Uint8		*test;
 	int			i;
+	int			new_size;
 
 	surr = load_tex(file_name, SDL_PIXELFORMAT_ARGB32);
-	res = 0;
-	params->w = surr->w;
-	params->h = surr->h;
-	res = (cl_uint*)ft_memalloc(params->w * params->h * sizeof(cl_uint));
-	test = (Uint8*)res;
-	if (res == 0)
-		return (0);
+
+	envi->txt_par[envi->txt_count].w = surr->w;
+	envi->txt_par[envi->txt_count].h = surr->h;
+	envi->txt_par[envi->txt_count].start_pos = envi->textures_size;
+
+	new_size = envi->textures_size + surr->w * surr->h;
+	tmp = (cl_uint*)ft_realloc(envi->txt, sizeof(cl_uint) * new_size, sizeof(cl_uint) * envi->textures_size);
+	if (envi->txt)
+		free(envi->txt);
+	envi->txt = tmp;
+	
+	if (envi->txt == 0)
+		return (error_message(RED"couldnt reallocate for some reason"COLOR_OFF));
 	i = -1;
 	pixels = (Uint8*)surr->pixels;
-
 	while (++i < surr->w * surr->h)
-		res[i] = (pixels[i * 4] << 24) + (pixels[i * 4 + 1] << 16) + (pixels[i * 4 + 2] << 8) + pixels[i * 4 + 3];
+		envi->txt[envi->txt_par[envi->txt_count].start_pos + i] = (pixels[i * 4] << 24) + (pixels[i * 4 + 1] << 16) + (pixels[i * 4 + 2] << 8) + pixels[i * 4 + 3];
 	SDL_FreeSurface(surr);
-	return (res);
+
+	envi->textures_size = new_size;
+	envi->txt_count++;
+	return (0);
 }
