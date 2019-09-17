@@ -6,13 +6,18 @@
 /*   By: ozhyhadl <ozhyhadl@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/08/19 13:39:54 by apavlov           #+#    #+#             */
-/*   Updated: 2019/09/12 22:54:05 by ozhyhadl         ###   ########.fr       */
+/*   Updated: 2019/09/17 14:13:00 by ozhyhadl         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CL_SILENCE_DEPRECATION
 #  define CL_SILENCE_DEPRECATION
 #endif
+
+#ifndef CL_USE_DEPRECATED_OPENCL_1_2_APIS
+# define CL_USE_DEPRECATED_OPENCL_1_2_APIS
+#endif
+
 
 #ifndef RT_H
 # define RT_H
@@ -21,24 +26,25 @@
 
 # include "../libft/libft.h"
 # ifdef __APPLE__
-# include "../frameworks/SDL2.framework/Headers/SDL.h"
-# include "../frameworks/SDL2_image.framework/Headers/SDL_image.h"
-# include "../frameworks/mxml-3.0/include/mxml.h" // Add path mxml header ++
-# include <OpenCL/opencl.h>
+#  include "../frameworks/SDL2.framework/Headers/SDL.h"
+#  include "../frameworks/SDL2_image.framework/Headers/SDL_image.h"
+#  include "../frameworks/mxml-3.0/include/mxml.h" // Add path mxml header ++
+#  include <OpenCL/opencl.h>
 # else
 #  include <SDL2/SDL.h>
 #  include <CL/cl.h>
 #  include <SDL2/SDL_image.h>
+#  include <mxml.h>
 # endif
 # include <stdio.h>
 # include "terminal_colors.h"
 
 
 
-# define DEVICE_TYPE	CL_DEVICE_TYPE_GPU
+# define DEVICE_TYPE	CL_DEVICE_TYPE_CPU
 # ifdef __APPLE__
-# define WIN_WIDTH	1600
-# define WIN_HEIGHT	1200
+# define WIN_WIDTH	800
+# define WIN_HEIGHT	600
 # else
 #  define WIN_WIDTH	1200
 #  define WIN_HEIGHT	800
@@ -49,10 +55,9 @@
 # define MIN(a,b)				(((a) < (b)) ? (a) : (b))
 # define MAX(a,b)				(((a) > (b)) ? (a) : (b))
 # define CLAMP(a, mi,ma)		MIN(MAX(a,mi),ma)
-
+# define AIR_IOR 1.00029;
 # define D	0.1
-# define VW	(1.155 * D)
-# define VH	(VW * WIN_HEIGHT / WIN_WIDTH)
+
 
 # define MAX_TEXTURE_COUNT 10
 
@@ -105,6 +110,13 @@ typedef union	u_shape
 	t_cylin_data	cylin;
 }				t_shape;
 
+typedef struct	s_rotation_matrix
+{
+	cl_double3		e1;
+	cl_double3		e2;
+	cl_double3		e3;
+}				t_rotation_matrix;
+
 struct	s_fig
 {
 	cl_int		fig_type;
@@ -115,9 +127,12 @@ struct	s_fig
 	cl_double	reflective;
 	cl_double	trans;
 	cl_double3	rotation;
+	t_rotation_matrix	rotation_martix;
 	cl_double	ior;
 	cl_int		text_no;
 	cl_int		normal_map_no;
+	cl_double2	txt_offset;
+	cl_double2	txt_scale;
 };
 
 struct	s_sdl
@@ -240,6 +255,7 @@ int			close_sdl(t_sdl *sdl);
 **	Friendly user stuff
 */
 int			error_message(char *mess);
+int			print_usage(void);
 
 
 /*
@@ -259,5 +275,6 @@ int			there_will_be_loop(t_rt *rt);
 # include "parse.h"
 # include "mymath.h"
 # include "xml.h"
+# include "editor.h"
 
 #endif

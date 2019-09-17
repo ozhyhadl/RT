@@ -6,7 +6,7 @@
 /*   By: ozhyhadl <ozhyhadl@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/08/18 17:34:14 by ozhyhadl          #+#    #+#             */
-/*   Updated: 2019/09/11 20:26:33 by ozhyhadl         ###   ########.fr       */
+/*   Updated: 2019/09/17 14:31:09 by ozhyhadl         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,7 @@ int	ft_parse_xml(char *name_file, t_scene *scene, t_pov *pov)
 	node = mxmlGetNextSibling(node);
 	if (!ft_strequ(mxmlGetElement(node), "RT"))
 		return (exit_parse(tree, fp, RED"Use first tag <RT> </RT>"COLOR_OFF));
+	ft_add_w_h(pov, node);
 	node = mxmlGetFirstChild(node);
 	if (ft_read_xml(node, scene, pov))
 		return (exit_parse(tree, fp, NULL));

@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-!-- This is a comment 
-	spher : centre, radius, RGB, transparency, reflective, specular, texture.
-	plane : dot, normal, RGB, transparency, reflective, specular, texture.
-	cylin : dot, dir, RGB, transparency, reflective, specular, texture.
-	cone  : vertex, dir, angle, RGB, transparency, reflective, specular, texture.
-	light : type, position, intensity.
-	cam   : position.
+!-- This is a comment
+	RT		: width, heigth.
+	spher	: centre, radius, RGB, transparency, reflective, specular, texture, bump.
+	plane	: dot, normal, RGB, transparency, reflective, specular, texture, bump.
+	cylin	: dot, dir, RGB, transparency, reflective, specular, texture, bump.
+	cone	: vertex, dir, angle, RGB, transparency, reflective, specular, texture, bump.
+	light	: type, position, intensity.
+	cam		: position.
 --
-<RT>
+<RT width = "1000" heigth = "1000">
 	<spher>
 		<centre>1 2 3</centre>
 		<texture> -1 </texture>
+		<specular> 1000</specular>
 	</spher>
 	<cylin>
 		<dot>10 2 0</dot>
@@ -31,7 +33,7 @@
 	<light>
 		<type> point </type>
 		<position> 0 1 -4 </position>
-		<intensity> 0.5 0.5 0.5 </intensity>
+		<intensity> 4 4 4 </intensity>
 	</light>
 	<light>
 		<type> ambient </type>

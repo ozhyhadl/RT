@@ -6,7 +6,7 @@
 /*   By: ozhyhadl <ozhyhadl@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/12 22:50:17 by ozhyhadl          #+#    #+#             */
-/*   Updated: 2019/09/12 22:52:50 by ozhyhadl         ###   ########.fr       */
+/*   Updated: 2019/09/17 14:30:35 by ozhyhadl         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,5 +67,10 @@ void	ft_write_3param(cl_double3 param, mxml_node_t *node, const char *name);
 void	ft_write_param(cl_double param, mxml_node_t *node, const char *name);
 void	ft_write_cam(t_pov pov, mxml_node_t *data);
 void	ft_write_light(t_light light, mxml_node_t *data);
+
+/*
+**	Add ++ xml width & heigth
+*/
+void	ft_add_w_h(t_pov *pov, mxml_node_t *rt);
 
 #endif

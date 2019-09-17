@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init_cl.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: apavlov <apavlov@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ozhyhadl <ozhyhadl@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/08/19 15:02:32 by apavlov           #+#    #+#             */
-/*   Updated: 2019/09/12 16:08:43 by apavlov          ###   ########.fr       */
+/*   Updated: 2019/09/14 18:59:01 by ozhyhadl         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,11 +99,11 @@ int			create_program_and_kernels(t_cl *cl)
 	return (0);
 }
 
-int			set_global_and_local_item_size(t_cl *cl)
+int			set_global_and_local_item_size(t_cl *cl, t_rt *rt)
 {
 	cl_int	ret;
 
-	cl->global_size = WIN_HEIGHT * WIN_WIDTH;
+	cl->global_size = rt->pov.h * rt->pov.w;
 	ret = clGetKernelWorkGroupInfo(cl->rt_kernel, cl->device_id, CL_KERNEL_WORK_GROUP_SIZE, sizeof(size_t), &cl->local_size, 0);
 	cl->local_size = cl->local_size > cl->global_size ? cl->global_size : cl->local_size;
 	if (ret != CL_SUCCESS)
@@ -120,7 +120,7 @@ int			set_up_memory(t_rt *rt, t_cl *cl)
 	cl->scene_mem = clCreateBuffer(cl->context, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, sizeof(t_scene), &rt->scene, &ret);
 	if (ret != CL_SUCCESS)
 		return (error_message(RED"clCreateBuffer(scene_mem) exception"COLOR_OFF));
-	cl->pixel_ptr = clCreateBuffer(cl->context, CL_MEM_WRITE_ONLY | CL_MEM_HOST_READ_ONLY, sizeof(cl_uint) * WIN_HEIGHT * WIN_WIDTH, 0, &ret);
+	cl->pixel_ptr = clCreateBuffer(cl->context, CL_MEM_WRITE_ONLY | CL_MEM_HOST_READ_ONLY, sizeof(cl_uint) * rt->pov.h * rt->pov.w, 0, &ret);
 	if (ret != CL_SUCCESS)
 		return (error_message(RED"clCreateBuffer(pixel_ptr) exception"COLOR_OFF));
 	cl->texture_mem = clCreateBuffer(cl->context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(cl_uint) * rt->envi.textures_size, rt->envi.txt, &ret);
@@ -136,7 +136,7 @@ int			set_up_memory(t_rt *rt, t_cl *cl)
 		return (error_message(RED"clCreateBuffer(texture_mem) exception"COLOR_OFF));
 
 	//should i set another local and global size for second kernel?
-	ret = set_global_and_local_item_size(cl);
+	ret = set_global_and_local_item_size(cl, rt);
 	if (ret != CL_SUCCESS)
 		return (1);
 

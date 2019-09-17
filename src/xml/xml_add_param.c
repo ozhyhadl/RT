@@ -6,7 +6,7 @@
 /*   By: ozhyhadl <ozhyhadl@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/08/26 18:11:17 by ozhyhadl          #+#    #+#             */
-/*   Updated: 2019/09/12 20:25:52 by ozhyhadl         ###   ########.fr       */
+/*   Updated: 2019/09/16 20:23:42 by ozhyhadl         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,8 @@ int	add_for_all_obj(const char *str, t_scene *scene, int i, const char *tag)
 		scene->obj[i].trans = (cl_double)one_dot;
 	else if (ft_strequ(tag, "texture"))
 		scene->obj[i].text_no = (cl_int)ft_atoi(str);
+	else if (ft_strequ(tag, "bump"))
+		scene->obj[i].normal_map_no = (cl_int)ft_atoi(str);
 	else
 		return (1);
 	return (0);

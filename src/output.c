@@ -17,3 +17,10 @@ int		error_message(char *mess)
 	ft_putendl(mess);
 	return (1);
 }
+
+int		print_usage(void)
+{
+	ft_putendl(GREEN"Hey boy, to run this program you should \
+use :\n"CYAN"./RT\tor\t./RT scene/<scene>"COLOR_OFF);
+	return (1);
+}
