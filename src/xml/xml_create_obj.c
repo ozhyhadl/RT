@@ -19,7 +19,7 @@ static void	ft_create_all(t_scene *scene, int i)
 	scene->obj[i].reflective = (cl_double)0;
 	scene->obj[i].trans = (cl_double) 0;
 	scene->obj[i].text_no = -1;
-	scene->obj[i].noise = 1;
+	scene->obj[i].noise = -1;
 	scene->obj[i].normal_map_no = -1;
 	scene->obj[i].txt_offset = (cl_double2){{0, 0}};
 	scene->obj[i].txt_scale = (cl_double2){{1, 1}};
