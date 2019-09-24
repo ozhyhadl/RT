@@ -6,7 +6,7 @@
 /*   By: ozhyhadl <ozhyhadl@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/10 13:32:14 by ozhyhadl          #+#    #+#             */
-/*   Updated: 2019/09/12 22:35:39 by ozhyhadl         ###   ########.fr       */
+/*   Updated: 2019/09/24 04:13:38 by ozhyhadl         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,12 @@ int			is_param_ltag(const char *str)
 		ft_strequ(str, "dot") || ft_strequ(str, "normal") || \
 		ft_strequ(str, "intensity") || ft_strequ(str, "reflective") || \
 		ft_strequ(str, "dir") || ft_strequ(str, "specular") || \
-		ft_strequ(str, "bump"))
+		ft_strequ(str, "bump") || ft_strequ(str, "mmin") || \
+		ft_strequ(str, "mmax") || ft_strequ(str, "cutting") || \
+		ft_strequ(str, "cut_dot") || ft_strequ(str, "cut_normal") ||
+		ft_strequ(str, "rotation") || ft_strequ(str, "ior") || \
+		ft_strequ(str, "transp_map_no") || ft_strequ(str, "txt_offset") || \
+		ft_strequ(str, "txt_scale"))
 		return (1);
 	return (0);
 }

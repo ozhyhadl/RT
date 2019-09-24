@@ -10,6 +10,45 @@ double3	new_basis(double3 point, t_rotation_matrix m)
 	return (res);
 }
 
+double2	get_rectangle_coords(double3 intersect_point, t_fig data)
+{
+	double2		st;
+
+	double3		point = intersect_point - data.shape.rectangle.v0;
+	if (length(data.rotation) > 0)
+		point = new_basis(point, data.rotation_martix);
+	st = (double2)(point[0], point[1]);
+	st *= data.txt_scale;
+	return (st);
+}
+
+double2	get_disk_coords(double3 intersect_point, t_fig data)
+{
+	double2		st;
+
+	double3		point = intersect_point - data.shape.disk.cent;
+	if (length(data.rotation) > 0)
+		point = new_basis(point, data.rotation_martix);
+	point /= data.shape.disk.radius;
+	st[0] = length(point);
+
+	st[1] = atan2(point[1], point[0]) / (2 * M_PI);
+	st *= data.txt_scale;
+	return (st);
+}
+
+double2	get_triangle_coords(double3 intersect_point, t_fig data)
+{
+	double2		st;
+
+	double3		point = intersect_point - data.shape.triangle.v0;
+	if (length(data.rotation) > 0)
+		point = new_basis(point, data.rotation_martix);
+	st = (double2)(point[0], point[1]);
+	st *= data.txt_scale;
+	return (st);
+}
+
 double2	get_sperical_coords(double3 intersect_point, t_fig data)
 {
 	double2		st;
@@ -102,6 +141,15 @@ double2	get_texture_space_coords(double3 intersect_point, t_fig data)
 			break;
 		case CONE:
 			st = get_cone_coords(intersect_point, data);
+			break;
+		case TRIANGLE:
+			st = get_triangle_coords(intersect_point, data);
+			break;
+		case DISK:
+			st = get_disk_coords(intersect_point, data);
+			break;
+		case RECTANGLE:
+			st = get_rectangle_coords(intersect_point, data);
 			break;
 	}
 	st += data.txt_offset;

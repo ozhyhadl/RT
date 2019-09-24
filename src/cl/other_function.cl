@@ -1,5 +1,7 @@
 #include "kernel.h"
 
+
+
 void	swap(double* a, double*b)
 {
 	double	c;

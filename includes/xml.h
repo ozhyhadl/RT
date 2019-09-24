@@ -6,7 +6,7 @@
 /*   By: ozhyhadl <ozhyhadl@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/12 22:50:17 by ozhyhadl          #+#    #+#             */
-/*   Updated: 2019/09/17 14:30:35 by ozhyhadl         ###   ########.fr       */
+/*   Updated: 2019/09/24 00:53:43 by ozhyhadl         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ int		ft_add_radius(const char *str, t_scene *scene, int i);
 int		ft_add_normal_dir(const char *str, t_scene *scene, int i, const char *tag);
 int		ft_add_tanget(const char *str, t_scene *scene, int i);
 int		ft_add_type_light(t_scene *scene, int l, char *str);
+int		ft_add_mmin_mmax(const char *str, t_scene *scene, int i, const char *tag);
 
 /*
 **	Add ++ add_param(color, specular, reflection) to figure

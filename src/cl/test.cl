@@ -1,11 +1,11 @@
 #include "kernel.h"
 
-double3	reflected_ray(double3 normal, double3 prim_ray) //not sure
+double3	reflected_ray(double3 normal, double3 prim_ray)
 {
 	return (prim_ray - 2 * dot(normal, prim_ray) * normal);
 }
 
-// double3	reflected_ray(double3 normal, double3 prim_ray) //not sure
+// double3	reflected_ray(double3 normal, double3 prim_ray)
 // {
 // 	return (2 * dot(normal, prim_ray) * normal - prim_ray);
 // }
@@ -25,7 +25,7 @@ double3	beers_law(double distance, double3 obj_absorb)
 	return (exp(obj_absorb * (-distance)));
 }
 
-double fresnel(double3 prim_ray, double3 normal, double n1, double reflective)
+double fresnel(double3 prim_ray, double3 normal, double n1)
 {
 	double cosX = -dot(prim_ray, normal); 
 	double n2 = 1.00029;
@@ -44,8 +44,6 @@ double fresnel(double3 prim_ray, double3 normal, double n1, double reflective)
 	}
 	double x = 1.0 - cosX;
 	double ret = r0 + (1.0 - r0) * x * x * x * x * x;
- 
-	// ret = (reflective + (1.0 - reflective) * ret);
 	return (ret);
 }
 
@@ -96,9 +94,48 @@ double3	get_intersity_after_shadow_rays(double3 intersect_point, double3 light_d
 	return (local_intensity);
 }
 
+double3	ft_noise1 (double2 coords)
+{
+	double3 color;
+	double z;
+
+	z = floor(sin(coords[0] * 2 * M_PI) + sin(coords[1] * 2 * M_PI ));
+	color = (double3){((int)z >> 16) & 0xFF, ((int)z >> 8) & 0xFF, ((int)z & 0xFF)};
+	return (color);
+}
+
+double3	ft_noise (double3 eye, double2 dir)
+{
+
+	double3		color;
+	double3		oc = eye;
+	uint			u;
+	int			v;
+	
+	// if (dir[0])
+	// 	dir[0] = dir[0] ;
+	// oc[0] = random[get_global_id(0) % 5] + (get_global_id(0) << 4 >> 6);
+	// oc[1] = get_global_id(0) * random[get_global_id(0) % 5];
+	// u = ((sin(oc[0] * 2 * M_PI * 5) + 1) * 10000000) * 4;
+	// v = ((cos(oc[1] * 2 * M_PI * 5) + 1) * 10000000) * 4;
+	// if (v)
+	// 	u *= v;
+
+	uint seed = random[get_global_id(0) % 5] + get_global_id(0);
+	uint t = seed ^ (seed << 11);  
+	uint result = (int)random[get_global_id(0) % 5] ^ ((int)random[get_global_id(0) % 5] >> 19) ^ (t ^ (t >> 8));
+
+	u = result;
+	color = (double3){(u >> 16) & 0xFF, (u >> 8) & 0xFF, (u & 0xFF)};
+	color[2] = (color[0] + color[1] + color[2]) / 3.0;
+	color[1] = color[2];
+	color[0] = color[1];
+	return (color);
+}
+
 double3	calculate_light(__global t_scene *scene, double3 eye, \
 						double3 dir, double3 normal, double3 intersect_point, \
-						t_fig fig, __global uint *texture, __global t_txt_params *txt_params)
+						t_fig fig, __global uint *texture, __global t_txt_params *txt_params, double2 texture_space_coords)
 {
 	int		i;
 	__global t_light	*light;
@@ -109,12 +146,8 @@ double3	calculate_light(__global t_scene *scene, double3 eye, \
 	double3	reflect_ray;
 	double3	local_intensity;
 	double3	new_normal;
-	double2 texture_space_coords;
 	double	light_len;
 	double3	pix_color;
-
-	if ((fig.normal_map_no > -1) || (fig.text_no > -1))
-		texture_space_coords = get_texture_space_coords(intersect_point, fig);
 	
 	if (fig.normal_map_no > -1)
 	{
@@ -129,8 +162,13 @@ double3	calculate_light(__global t_scene *scene, double3 eye, \
 	else
 		new_normal = normal;
 	
+	
 	if (fig.text_no > -1)
-	 	pix_color = uint_to_double3(get_texture_pixel(texture_space_coords, texture, txt_params[fig.text_no], fig.text_no));
+		pix_color = uint_to_double3(get_texture_pixel(texture_space_coords, texture, txt_params[fig.text_no], fig.text_no));
+	else if (fig.noise == 0)
+		pix_color = ft_noise(eye, texture_space_coords);
+	else if (fig.noise == 1)
+	pix_color = ft_noise1(texture_space_coords);
 	else
 		pix_color = fig.color;
 
@@ -187,6 +225,8 @@ double3		ray_trace(double3 eye, double3 dir, __global t_scene *scene, double min
 	int			count = 1;
 	int			curr = 0;
 	double3		color = 0;
+	double		trans;
+	double2		texture_space_coords;
 
 	double3		intersect_point;
 	t_obj_and_dist	obj_and_dist;
@@ -211,22 +251,32 @@ double3		ray_trace(double3 eye, double3 dir, __global t_scene *scene, double min
 		{
 			fig = scene->obj[obj_and_dist.obj];
 			intersect_point = curr_node.start + curr_node.dir * obj_and_dist.dist;
+			if ((fig.normal_map_no > -1) || (fig.text_no > -1) || (fig.transparancy_map_no > -1) || fig.noise > -1)
+				texture_space_coords = get_texture_space_coords(intersect_point, fig);
+			if (fig.transparancy_map_no == -1)
+				trans = fig.trans;
+			else
+			{
+				trans = uint_to_double3(get_texture_pixel(texture_space_coords, texture, txt_params[fig.transparancy_map_no], fig.transparancy_map_no))[0];
+				trans = 1 - trans / 255;
+			}
 			//normal calculations
 			normal = calculate_normal(fig, intersect_point, curr_node);
 			//--------------------
 
 			//get local color value
-			local_color = calculate_light(scene, curr_node.start, curr_node.dir, normal, intersect_point, fig, texture, txt_params);
+			local_color = calculate_light(scene, curr_node.start, curr_node.dir, normal, intersect_point, fig, texture, txt_params, texture_space_coords);
 
 			//mix color and go deeper
 			local_color *= curr_node.part_of_primary_ray;
-			double fren = fresnel(curr_node.dir, normal, fig.ior, fig.reflective); //prart of reflected ray
-			if (fig.trans > 0 && count < tree_nodes)
+			double fren = 0;
+			fren = fresnel(curr_node.dir, normal, fig.ior); //prart of reflected ray
+			if (trans > 0 && count < tree_nodes)
 			{
-				tree[count].part_of_primary_ray = curr_node.part_of_primary_ray * (1 - fren) * fig.trans;
+				tree[count].part_of_primary_ray = curr_node.part_of_primary_ray * (1 - fren) * trans;
 				if (tree[count].part_of_primary_ray > MINIMUM_INTENSITY)
 				{
-					local_color *= (1 - fig.trans);
+					local_color *= (1 - trans);
 					tree[count].start = intersect_point;
 					tree[count].dir = normalize(refract_ray(curr_node.dir, normal, fig.ior));
 					tree[count].min_range = EPSILON;
@@ -236,7 +286,7 @@ double3		ray_trace(double3 eye, double3 dir, __global t_scene *scene, double min
 			}
 			if (fig.reflective > 0 && count < tree_nodes)
 			{
-				tree[count].part_of_primary_ray = curr_node.part_of_primary_ray * (fig.reflective * (1 - fig.trans) + fig.trans * fren);
+				tree[count].part_of_primary_ray = curr_node.part_of_primary_ray * (fig.reflective * (1 - trans) + trans * fren);
 				if (tree[count].part_of_primary_ray > MINIMUM_INTENSITY)
 				{
 					local_color *= (1 - fig.reflective);

@@ -6,38 +6,11 @@
 /*   By: ozhyhadl <ozhyhadl@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/08/26 18:11:17 by ozhyhadl          #+#    #+#             */
-/*   Updated: 2019/09/16 20:23:42 by ozhyhadl         ###   ########.fr       */
+/*   Updated: 2019/09/24 01:34:10 by ozhyhadl         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/rt.h"
-
-int	add_for_all_obj(const char *str, t_scene *scene, int i, const char *tag)
-{
-	cl_double	one_dot;
-
-	if (!ft_get_3param(1, str, NULL, &one_dot))
-		return (1);
-	else if (ft_strequ(tag, "specular") && (one_dot < -1 || one_dot > 1000))
-		return (error_message(RED"XML: -1 <= specular <= 1000"COLOR_OFF));
-	else if (ft_strequ(tag, "reflective") && (one_dot < 0 || one_dot > 1))
-		return (error_message(RED"XML: 0 <= reflective <= 1"COLOR_OFF));
-	else if (ft_strequ(tag, "transparency") && (one_dot < 0 || one_dot > 1))
-		return (error_message(RED"XML: 0 <= transparency <= 1"COLOR_OFF));
-	else if (ft_strequ(tag, "specular"))
-		scene->obj[i].specular = (cl_int)ft_atoi(str);
-	else if (ft_strequ(tag, "reflective"))
-		scene->obj[i].reflective = (cl_double)one_dot;
-	else if (ft_strequ(tag, "transparency"))
-		scene->obj[i].trans = (cl_double)one_dot;
-	else if (ft_strequ(tag, "texture"))
-		scene->obj[i].text_no = (cl_int)ft_atoi(str);
-	else if (ft_strequ(tag, "bump"))
-		scene->obj[i].normal_map_no = (cl_int)ft_atoi(str);
-	else
-		return (1);
-	return (0);
-}
 
 int	add_position(const char *str, t_scene *scene, int i, const char *tag)
 {

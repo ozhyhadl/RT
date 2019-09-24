@@ -6,7 +6,7 @@
 /*   By: ozhyhadl <ozhyhadl@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/01 12:22:48 by ozhyhadl          #+#    #+#             */
-/*   Updated: 2019/09/17 15:12:59 by ozhyhadl         ###   ########.fr       */
+/*   Updated: 2019/09/17 15:33:24 by ozhyhadl         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,32 +19,24 @@ void	ft_add_w_h(t_pov *pov, mxml_node_t *rt)
 
 	w = -1;
 	h = -1;
+	pov->w = WIN_WIDTH;
+	pov->h = WIN_HEIGHT;
 	if (mxmlElementGetAttr(rt, "width") != NULL)
 		if (ft_get_3param(1, mxmlElementGetAttr(rt, "width"), NULL, &w))
+		{
 			if (w > 0 && w < 3000)
 				pov->w = w;
 			else
-			{
-				error_message(RED"WIDTH must be > 0 and < 3000"COLOR_OFF);
-				pov->w = WIN_WIDTH;
-			}
-		else
-			return ;
-	else
-		pov->w = WIN_WIDTH;
+				error_message(RED"0 < width < 3000:now default"COLOR_OFF);
+		}
 	if (mxmlElementGetAttr(rt, "heigth") != NULL)
 		if (ft_get_3param(1, mxmlElementGetAttr(rt, "heigth"), NULL, &h))
+		{	
 			if (h > 0 && h < 3000)
 				pov->h = h;
 			else
-			{
-				error_message(RED"HEIGTH must be > 0 and < 3000"COLOR_OFF);
-				pov->h = WIN_HEIGHT;
-			}
-		else
-			return ;
-	else
-		pov->h = WIN_HEIGHT;
+				error_message(RED"0 < height < 3000:now default"COLOR_OFF);
+		}
 }
 
 void	ft_create_cam(t_pov *pov)

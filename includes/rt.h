@@ -6,7 +6,7 @@
 /*   By: ozhyhadl <ozhyhadl@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/08/19 13:39:54 by apavlov           #+#    #+#             */
-/*   Updated: 2019/09/17 14:13:00 by ozhyhadl         ###   ########.fr       */
+/*   Updated: 2019/09/24 04:12:52 by ozhyhadl         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,24 +41,27 @@
 
 
 
-# define DEVICE_TYPE	CL_DEVICE_TYPE_CPU
+# define DEVICE_TYPE	CL_DEVICE_TYPE_GPU
 # ifdef __APPLE__
-# define WIN_WIDTH	800
-# define WIN_HEIGHT	600
+# define WIN_WIDTH		800
+# define WIN_HEIGHT		600
 # else
-#  define WIN_WIDTH	1200
+#  define WIN_WIDTH		1200
 #  define WIN_HEIGHT	800
 # endif
 # define MAX_OBJ_COUNT 20
 # define MAX_LIGHTING_COUNT 10
+# define MAX_NEGATIVE_OBJ_COUNT 5
 # define RGB(v) (((int)v[0] << 16) + ((int)v[1] << 8) + (int)v[2])
 # define MIN(a,b)				(((a) < (b)) ? (a) : (b))
 # define MAX(a,b)				(((a) > (b)) ? (a) : (b))
 # define CLAMP(a, mi,ma)		MIN(MAX(a,mi),ma)
-# define AIR_IOR 1.00029;
+# define MIN_IOR 1.01;
 # define D	0.1
 
-
+# define BIG_VALUE 1000000
+# define COUNT_BUTT 3
+# define RENDER_ITARATION 20
 # define MAX_TEXTURE_COUNT 10
 
 typedef	struct s_fig	t_fig;
@@ -66,10 +69,17 @@ typedef	struct s_sdl	t_sdl;
 typedef	struct s_scene	t_scene;
 typedef	struct s_rt		t_rt;
 typedef	struct s_pov	t_pov;
+typedef	double	t_vector __attribute__((vector_size(sizeof(double)*4)));
+
+
+enum	e_but
+{
+	SENT = 1, SAVE, SCREEN
+};
 
 enum	e_fig
 {
-	SPHERE = 1, PLANE, CONE, CYLIN
+	SPHERE = 1, PLANE, CONE, CYLIN, RECTANGLE, TRIANGLE, DISK, ELLIPSE, TORUS
 };
 enum	e_light
 {
@@ -93,13 +103,47 @@ typedef struct	s_cone_data
 	cl_double3	vertex;
 	cl_double3	dir;
 	cl_double	tangent;
+	cl_double	mmax; //add to parser. inf = BIG_VALUE	---done
+	cl_double	mmin; //add to parser. inf = -BIG_VALUE	---done
 }				t_cone_data;
+
+typedef struct	s_rectangle_data //add to parser
+{
+	cl_double3	v0;
+	cl_double3	v1;
+	cl_double3	v2;
+	cl_double3	v3;
+}				t_rectangle_data;
+
+typedef struct	s_disk_data  //add to parser
+{
+	cl_double3	cent;
+	cl_double3	normal;
+	cl_double	radius;
+}				t_disk_data;
+
+typedef struct	s_torus_data 
+{
+}				t_torus_data;
+
+typedef struct	s_ellipse_data
+{
+}				t_ellipse_data;
+
+typedef struct	s_triangle_data  //add to parser
+{
+	cl_double3	v0;
+	cl_double3	v1;
+	cl_double3	v2;
+}				t_triangle_data;
 
 typedef struct	s_cylin_data
 {
 	cl_double3	dir;
 	cl_double3	dot;
 	cl_double	radius;
+	cl_double	mmax; //add to parser. inf = BIG_VALUE	---done
+	cl_double	mmin; //add to parser. inf = -BIG_VALUE	---done
 }				t_cylin_data;
 
 typedef union	u_shape
@@ -108,6 +152,11 @@ typedef union	u_shape
 	t_cone_data		cone;
 	t_plane_data	plane;
 	t_cylin_data	cylin;
+	t_rectangle_data	rectangle;
+	t_triangle_data	triangle;
+	t_torus_data	torus;
+	t_ellipse_data	ellipse;
+	t_disk_data		disk;
 }				t_shape;
 
 typedef struct	s_rotation_matrix
@@ -124,15 +173,20 @@ struct	s_fig
 
 	cl_double3	color;
 	cl_int		specular;
+	cl_int		noise;
 	cl_double	reflective;
 	cl_double	trans;
-	cl_double3	rotation;
-	t_rotation_matrix	rotation_martix;
-	cl_double	ior;
+	cl_double3	rotation;	//+
+	t_rotation_matrix	rotation_martix;	//+
+	cl_double	ior;	//+
 	cl_int		text_no;
 	cl_int		normal_map_no;
-	cl_double2	txt_offset;
-	cl_double2	txt_scale;
+	cl_int		transparancy_map_no;	//+
+	cl_double2	txt_offset;	//+
+	cl_double2	txt_scale;	//+
+
+	cl_int			cutting;  //add to parser. default 0	---done
+	t_plane_data	cutting_plane;  //add to parser. if cutting = 0 unused	---done
 };
 
 struct	s_sdl
@@ -163,12 +217,21 @@ typedef struct	s_light
 	cl_double3	v;
 }				t_light;
 
+typedef struct	s_negative_fig //add to parser. currently supported sphere planes and cone
+{
+	cl_int		fig_type;
+	t_shape		shape;
+	t_rotation_matrix	rotation_matrix; //only for cylinder
+}				t_negative_fig;
+
 struct	s_scene
 {
-	cl_int		count_obj;
-	t_fig		obj[MAX_OBJ_COUNT];
-	cl_int		count_light;
-	t_light		light[MAX_LIGHTING_COUNT];
+	cl_int			count_obj;
+	t_fig			obj[MAX_OBJ_COUNT];
+	cl_int			count_light;
+	t_light			light[MAX_LIGHTING_COUNT];
+	cl_int			count_neg_obj; //default 0	---done
+	t_negative_fig	neg_obj[MAX_NEGATIVE_OBJ_COUNT];
 };
 
 typedef struct	s_cl
@@ -218,15 +281,39 @@ typedef struct	s_edi
 	int		chosen_obj;
 }				t_edi;
 
+typedef struct	s_button
+{
+	int			type;
+	SDL_Surface	*image;
+	SDL_Rect	offset;
+	int			available;
+}				t_button;
+
+typedef struct	s_obj_movement
+{
+	int			move; //bool
+	cl_double3	dir;
+}				t_obj_movement;
+
+typedef struct	s_filters
+{
+	int		motion;
+	cl_double3	*colors;
+	cl_uint		*buff;
+	t_obj_movement	obj_movement[MAX_OBJ_COUNT];
+}				t_filters;
+
 
 struct	s_rt
 {
-	t_sdl	sdl;
-	t_scene	scene;
-	t_pov	pov;
-	t_cl	cl;
-	t_envi	envi;
-	t_edi	edi;
+	t_sdl		sdl;
+	t_scene		scene;
+	t_pov		pov;
+	t_cl		cl;
+	t_envi		envi;
+	t_filters	filters;
+	t_edi		edi;
+	t_button	butt[COUNT_BUTT];
 };
 
 /*
@@ -267,7 +354,12 @@ int			render_scene(t_rt *rt);
 **	User
 */
 int			there_will_be_loop(t_rt *rt);
-
+/*
+**	Button
+*/
+int			init_but(t_rt *rt);
+void		apply_surface(SDL_Surface *dest, t_rt *rt);
+int			pres_buttn(t_rt *rt, int x, int y);
 /*
 **	Parse
 */

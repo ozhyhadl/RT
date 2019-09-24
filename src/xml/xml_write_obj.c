@@ -6,7 +6,7 @@
 /*   By: ozhyhadl <ozhyhadl@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/12 22:09:58 by ozhyhadl          #+#    #+#             */
-/*   Updated: 2019/09/12 22:16:23 by ozhyhadl         ###   ########.fr       */
+/*   Updated: 2019/09/24 01:04:52 by ozhyhadl         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,8 @@ void	ft_write_cylin(t_cylin_data cylin, mxml_node_t *data, t_fig fig)
 	node = mxmlNewElement(data, "cylin");
 	ft_write_3param(cylin.dot, node, (const char *)"dot");
 	ft_write_3param(cylin.dir, node, (const char *)"dir");
+	ft_write_param(cylin.mmax, node, (const char *)"mmax");
+	ft_write_param(cylin.mmin, node, (const char *)"mmin");
 	ft_write_all(fig, node);
 }
 
@@ -49,6 +51,8 @@ void	ft_write_cone(t_cone_data cone, mxml_node_t *data, t_fig fig)
 	node = mxmlNewElement(data, "cone");
 	ft_write_3param(cone.vertex, node, (const char *)"vertex");
 	ft_write_3param(cone.dir, node, (const char *)"dir");
+	ft_write_param(cone.mmax, node, (const char *)"mmax");
+	ft_write_param(cone.mmin, node, (const char *)"mmin");
 	ft_write_param(cone.tangent * 180 / 3.14, node, (const char *)"angle");
 	ft_write_all(fig, node);
 }

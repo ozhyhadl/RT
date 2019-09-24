@@ -1,33 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 !-- This is a comment
 	RT		: width, heigth.
-	spher	: centre, radius, RGB, transparency, reflective, specular, texture, bump.
-	plane	: dot, normal, RGB, transparency, reflective, specular, texture, bump.
-	cylin	: dot, dir, RGB, transparency, reflective, specular, texture, bump.
-	cone	: vertex, dir, angle, RGB, transparency, reflective, specular, texture, bump.
+	spher	: centre, radius, RGB, transparency, reflective, specular, texture, bump, cutting, cut_dot, cut_normal, rotation, transp_map_no, ior.
+	plane	: dot, normal, RGB, transparency, reflective, specular, texture, bump, cutting, cut_dot, cut_normal, rotation, transp_map_no, ior.
+	cylin	: dot, dir, RGB, transparency, reflective, specular, texture, bump, mmin, mmax, cutting, cut_dot, cut_normal, rotation, transp_map_no, ior.
+	cone	: vertex, dir, angle, RGB, transparency, reflective, specular, texture, bump, mmin, mmax, cutting, cut_dot, cut_normal, rotation, transp_map_no, ior.
 	light	: type, position, intensity.
 	cam		: position.
 --
-<RT width = "1000" heigth = "1000">
+<RT width = "1200" heigth = "1200">
 	<spher>
 		<centre>1 2 3</centre>
-		<texture> -1 </texture>
-		<specular> 1000</specular>
+		<specular> 500</specular>
+		<transparency> 0 </transparency>
+		<reflective> 0 </reflective>
+
 	</spher>
 	<cylin>
 		<dot>10 2 0</dot>
 		<dir>0 0 1</dir>
 		<RGB>0 255 0</RGB>
+		<texture> -1 </texture>
+		<bump> -1 </bump>
 	</cylin>
 	<cone>
 		<vertex>0 1 5</vertex>
 		<angle> 30 </angle>
+		<reflective>0.4</reflective>
+		<transparency>0.8</transparency>
 	</cone>
 	<plane> 
 		<dot>10 0 0 </dot>
 		<RGB>83 83 83</RGB>
 		<reflective> 0 </reflective>
-		<normal>0 -1 0</normal>
+		<normal>0 1 0</normal>
 		<transparency> 0</transparency>
 	</plane>
 	<light>

@@ -116,11 +116,12 @@ int			set_global_and_local_item_size(t_cl *cl, t_rt *rt)
 int			set_up_memory(t_rt *rt, t_cl *cl)
 {
 	cl_int	ret;
+	int		i;
 
 	cl->scene_mem = clCreateBuffer(cl->context, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, sizeof(t_scene), &rt->scene, &ret);
 	if (ret != CL_SUCCESS)
 		return (error_message(RED"clCreateBuffer(scene_mem) exception"COLOR_OFF));
-	cl->pixel_ptr = clCreateBuffer(cl->context, CL_MEM_WRITE_ONLY | CL_MEM_HOST_READ_ONLY, sizeof(cl_uint) * rt->pov.h * rt->pov.w, 0, &ret);
+	cl->pixel_ptr = clCreateBuffer(cl->context, CL_MEM_WRITE_ONLY, sizeof(cl_uint) * rt->pov.h * rt->pov.w, 0, &ret);
 	if (ret != CL_SUCCESS)
 		return (error_message(RED"clCreateBuffer(pixel_ptr) exception"COLOR_OFF));
 	cl->texture_mem = clCreateBuffer(cl->context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(cl_uint) * rt->envi.textures_size, rt->envi.txt, &ret);

@@ -6,7 +6,7 @@
 /*   By: ozhyhadl <ozhyhadl@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/01 16:48:30 by ozhyhadl          #+#    #+#             */
-/*   Updated: 2019/09/16 20:18:00 by ozhyhadl         ###   ########.fr       */
+/*   Updated: 2019/09/24 04:27:07 by ozhyhadl         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,17 +50,31 @@ int	ft_is_light(mxml_node_t *node, t_scene *scene, int l, int what_is)
 		return (ft_add_type_light(scene, l, (char *)mxmlGetOpaque(node)));
 	else if (ft_strequ(name, "intensity") && \
 			ft_get_3param(3, mxmlGetOpaque(node), &dot, NULL))
-		//  if ((dot.s[0] >= 0 && dot.s[0] <= 1) && (dot.s[1] >= 0 && \
-		// 	dot.s[1] <= 1) && (dot.s[2] >= 0 && dot.s[2] <= 1))
+		  if (dot.s[0] >= 0 && dot.s[1] >= 0 && dot.s[2] >= 0 )
 			scene->light[l].intensity = (cl_double3)dot;
-		// else
-			// return (error_message(RED"XML : 0 <= intensity <= 1"COLOR_OFF));
+		 else
+			 return (error_message(RED"XML : intensity >= 0 "COLOR_OFF));
 	else if (ft_strequ(name, "position") && \
 		ft_get_3param(3, mxmlGetOpaque(node), &dot, NULL))
 		scene->light[l].v = (cl_double3)dot;
 	else
 		return (error_message(RED"XML: invalid tag for light"COLOR_OFF));
 	return (0);
+}
+
+int	ft_is_param2(mxml_node_t *node, t_scene *scene, int i, const char *name)
+{
+		if (ft_strequ(name, "mmin") || ft_strequ(name, "mmax"))
+			return(ft_add_mmin_mmax(mxmlGetOpaque(node), scene, i, name));
+		else if (ft_strequ(name, "transparency") || ft_strequ(name, "specular") || \
+		ft_strequ(name, "cut_normal") || ft_strequ(name, "texture") || \
+		ft_strequ(name, "bump") || ft_strequ(name, "cutting") || \
+		ft_strequ(name, "cut_dot") || ft_strequ(name, "reflective") || \
+		ft_strequ(name, "rotation") || ft_strequ(name, "ior") || \
+		ft_strequ(name, "transp_map_no") || ft_strequ(name, "txt_offset") || \
+		ft_strequ(name, "txt_scale"))
+			return (add_for_all_obj(mxmlGetOpaque(node), scene, i, name));
+		return (0);
 }
 
 int	ft_is_param(mxml_node_t *node, t_scene *scene, int i, int what_is)
@@ -75,16 +89,14 @@ int	ft_is_param(mxml_node_t *node, t_scene *scene, int i, int what_is)
 		return (add_position(mxmlGetOpaque(node), scene, i, name));
 	else if (ft_strequ(name, "RGB"))
 		return (ft_add_rgb(mxmlGetOpaque(node), scene, i));
-	else if (ft_strequ(name, "transparency") || ft_strequ(name, "specular") || \
-		ft_strequ(name, "reflective") || ft_strequ(name, "texture") || \
-		 ft_strequ(name, "bump"))
-		return (add_for_all_obj(mxmlGetOpaque(node), scene, i, name));
 	else if (ft_strequ(name, "radius"))
 		return (ft_add_radius(mxmlGetOpaque(node), scene, i));
 	else if (ft_strequ(name, "normal") || ft_strequ(name, "dir"))
 		return (ft_add_normal_dir(mxmlGetOpaque(node), scene, i, name));
 	else if (ft_strequ(name, "angle"))
 		return (ft_add_tanget(mxmlGetOpaque(node), scene, i));
+	else if (ft_is_param2(node, scene, i, name))
+		return(0);
 	ft_putstr(RED"XML : invalid param "COLOR_OFF);
 	ft_putendl(name);
 	return (1);

@@ -6,7 +6,7 @@
 /*   By: ozhyhadl <ozhyhadl@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/08/21 14:15:40 by apavlov           #+#    #+#             */
-/*   Updated: 2019/09/16 19:59:33 by ozhyhadl         ###   ########.fr       */
+/*   Updated: 2019/09/24 00:07:17 by ozhyhadl         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,25 +54,55 @@ int			rotation(t_rt *rt) //sometimes its must rotate z coordinate also
 	return (1);
 }
 
+cl_double3	canvas_to_viewport(int x, int y, t_pov pov)
+{
+	return ((cl_double3){{(double)x * pov.vw / pov.w, \
+								-(double)y * pov.vh / pov.h, (double)pov.d}});
+}
+
+static void	cool_little_function(t_rt *rt, cl_double3 *data, cl_double3 dir)
+{
+	cl_double3		oc;
+	
+	oc = minus_double3(rt->pov.coord, *data);
+	dir = increase_double3(dir, vector_len(oc));
+	*data = add_double3(*data, dir);
+}
+
 int		move_fig(t_rt *rt)
 {
-	int	x;
-	int	y;
+	int		x;
+	int		y;
+	t_fig	*obj;
 	cl_int	ret;
+	int		g_x;
+	int		g_y;
+	double		dir_len;
+
 	
 	if (rt->edi.chosen_obj != -1)
 	{
 		SDL_GetRelativeMouseState(&x, &y);
 		if (x == 0 && y == 0)
 			return(0);
+		SDL_GetMouseState(&g_x, &g_y);
+		obj = rt->scene.obj + rt->edi.chosen_obj;
+		dir_len = vector_len(canvas_to_viewport(g_x, g_y, rt->pov));	
+		cl_double3	dir = (cl_double3){{x * rt->pov.vh / (rt->pov.w * dir_len), (-y) * rt->pov.vw / (rt->pov.h * dir_len), 0}};
+		dir = ft_rotate_camera(dir, rt->pov);
 
-		cl_double3	dir = (cl_double3){{x / 100.0, -y / 100.0, 0}};
-		// dir = ft_rotate_minus_camera(dir, rt->pov);
-		// rt->scene.obj[rt->edi.chosen_obj].shape.sphere.cent = add_double3(rt->scene.obj[rt->edi.chosen_obj].shape.sphere.cent, dir);
-		// clEnqueueWriteBuffer(rt->cl.command_queue, rt->cl.scene_mem, CL_TRUE, 0, sizeof(t_scene), &rt->scene, 0, 0, 0);
+		if (obj->fig_type == SPHERE)
+			cool_little_function(rt, &obj->shape.sphere.cent, dir);	
+		else if (obj->fig_type == CONE)
+			cool_little_function(rt, &obj->shape.cone.vertex, dir);
+		else if (obj->fig_type == PLANE)
+			cool_little_function(rt, &obj->shape.plane.dot, dir);
+		else if (obj->fig_type == CYLIN)
+			cool_little_function(rt, &obj->shape.cylin.dot, dir);
 
-		// printf("i = %d x = %d cent.x = %f\n", rt->edi.chosen_obj, x, rt->scene.obj[rt->edi.chosen_obj].shape.sphere.cent.s[0]);
-
+		ret = clEnqueueWriteBuffer(rt->cl.command_queue, rt->cl.scene_mem, CL_TRUE, 0, sizeof(t_scene), &rt->scene, 0, 0, 0);
+		if (ret != CL_SUCCESS)
+			exit(error_message(RED"Something went bad\n"COLOR_OFF));
 		return (1);
 	}
 	return (0);
@@ -82,9 +112,6 @@ int			mouse_events(t_rt *rt, Uint8 button, int x, int y)
 	if (button == SDL_BUTTON_LEFT)
 	{
 		rt->edi.chosen_obj = get_object_intersection(rt, x, y);
-		if (rt->edi.chosen_obj > -1)
-			rt->scene.obj[rt->edi.chosen_obj].color = (cl_double3){{0, 0, 255}};
-		
 		return (1);
 	}
 	else	
@@ -96,7 +123,7 @@ int			user_events(t_rt *rt)
 	SDL_Event	ev;
 	int			changes;
 	static int	rotations = 0;
-	static int			move = 0;
+	static int	move = 0;
 
 	changes = 0;
 	changes += translate(rt);
@@ -109,19 +136,30 @@ int			user_events(t_rt *rt)
 		if (ev.type == SDL_KEYDOWN)
 		{
 			if (ev.key.keysym.sym == SDLK_ESCAPE)
-
-				exit(error_message(GREEN"Bye bye"COLOR_OFF) - 1);
+			{
+				system("leaks -q RT");
+					exit(error_message(GREEN"Bye bye"COLOR_OFF) - 1);
+			}
 			else if (ev.key.keysym.sym == SDLK_0)
 			{
 				rotations = !rotations;
 				SDL_SetRelativeMouseMode(rotations);
 				SDL_GetRelativeMouseState(NULL, NULL);
 			}
+			else if (ev.key.keysym.sym == SDLK_m)
+			{
+				rt->filters.obj_movement[0].move = 1;
+				rt->filters.obj_movement[0].dir = (cl_double3){{0, 0, 0.05}};
+				rt->filters.motion = !rt->filters.motion;
+				changes = 1;
+			}
 		}
 		else if (ev.type == SDL_QUIT)
 			exit(error_message(GREEN"Bye bye"COLOR_OFF) - 1);
 		else if (ev.type == SDL_MOUSEBUTTONDOWN)
 			{
+					if (ev.button.button == SDL_BUTTON_LEFT)
+						changes += pres_buttn(rt, ev.button.x, ev.button.y);
 				move = mouse_events(rt, ev.button.button, ev.button.x, ev.button.y);
 				SDL_GetRelativeMouseState(NULL, NULL);
 			}

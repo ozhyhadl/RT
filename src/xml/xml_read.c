@@ -6,7 +6,7 @@
 /*   By: ozhyhadl <ozhyhadl@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/08/18 17:34:14 by ozhyhadl          #+#    #+#             */
-/*   Updated: 2019/09/17 14:31:09 by ozhyhadl         ###   ########.fr       */
+/*   Updated: 2019/09/24 02:44:34 by ozhyhadl         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,12 +23,13 @@ int	exit_parse(mxml_node_t *tree, FILE *fp, char *str)
 
 int	ft_read_xml(mxml_node_t *node, t_scene *scene, t_pov *pov)
 {
-	int			index[2];
+	int			index[3];
 	mxml_node_t	*son;
 	int			what_is;
 
 	index[0] = -1;
 	index[1] = -1;
+	index[2] = -1;
 	while (node != NULL)
 	{
 		son = mxmlGetFirstChild(node);
@@ -47,6 +48,7 @@ int	ft_read_xml(mxml_node_t *node, t_scene *scene, t_pov *pov)
 	}
 	scene->count_obj = index[0] + 1;
 	scene->count_light = index[1] + 1;
+	scene->count_neg_obj = index[2] + 1;
 	return (0);
 }
 

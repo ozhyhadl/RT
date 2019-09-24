@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ozhyhadl <ozhyhadl@student.42.fr>          +#+  +:+       +#+        */
+/*   By: apavlov <apavlov@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/12 13:49:27 by apavlov           #+#    #+#             */
-/*   Updated: 2019/09/16 19:53:50 by ozhyhadl         ###   ########.fr       */
+/*   Updated: 2019/09/22 17:23:37 by apavlov          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,17 +27,30 @@ static int	init_pov(t_pov *pov)
 	pov->sx = sin(pov->dir.s[0]);
 	pov->cy = cos(pov->dir.s[1]);
 	pov->sy = sin(pov->dir.s[1]);
-	
 	return (0);
 }
 
 int			init_start_params(t_rt *rt)
 {
+	int		i;
+
 	rt->envi.textures_size = 0;
 	rt->envi.txt_count = 0;
 	rt->envi.txt = 0;
-	init_pov(&rt->pov);
 	
+
+	init_pov(&rt->pov);
+	rt->filters.motion = 0;
+	i = -1;
+	while (++i < MAX_OBJ_COUNT)
+	{
+		rt->filters.obj_movement[i].move = 0;
+		rt->filters.obj_movement[i].dir = (cl_double3){{0, 0, 0}};
+	}
+
+	rt->filters.colors = ft_memalloc(sizeof(cl_double3) * rt->pov.w * rt->pov.h);
+	rt->filters.buff = ft_memalloc(sizeof(cl_double3) * rt->pov.w * rt->pov.h);
+	i = -1;
 	return (0);
 }
 
@@ -50,6 +63,10 @@ int			read_textures(t_rt *rt)
 	if (read_texture("envi/123.png", &rt->envi))
 		return (error_message(RED"texture failure"COLOR_OFF));
 	if (read_texture("envi/waffles.jpg", &rt->envi))
+		return (error_message(RED"texture failure"COLOR_OFF));
+	if (read_texture("envi/perforated_2.jpg", &rt->envi))
+		return (error_message(RED"texture failure"COLOR_OFF));
+	if (read_texture("envi/icecream.jpg", &rt->envi))
 		return (error_message(RED"texture failure"COLOR_OFF));
 	return (0);	
 }

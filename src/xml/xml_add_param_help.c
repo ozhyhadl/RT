@@ -6,7 +6,7 @@
 /*   By: ozhyhadl <ozhyhadl@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/08/30 18:30:23 by ozhyhadl          #+#    #+#             */
-/*   Updated: 2019/09/01 15:26:13 by ozhyhadl         ###   ########.fr       */
+/*   Updated: 2019/09/24 04:39:25 by ozhyhadl         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,11 +48,15 @@ double	str_to_double(char *line)
 	return (res);
 }
 
-int		ft_del_split(char ***split, cl_double3 *dot, cl_double *one_dot)
+int		ft_del_split(char ***split, cl_double3 *dot, cl_double *one_dot, int count)
 {
 	int i;
 
-	if (dot != NULL && *split != NULL)
+
+	if (dot != NULL && *split != NULL && count == 2)
+	*dot = (cl_double3){{str_to_double((*split)[0]), \
+		str_to_double((*split)[1]), 0}};
+	else if (dot != NULL && *split != NULL)
 		*dot = (cl_double3){{str_to_double((*split)[0]), \
 		str_to_double((*split)[1]), str_to_double((*split)[2])}};
 	else if (one_dot != NULL && *split != NULL)
@@ -82,9 +86,9 @@ char	**ft_is_good_param(const char *str, int count)
 		i++;
 	if (split != NULL && i != count)
 	{
-		ft_putstr(RED"XML: Error count argument "COLOR_OFF);
+		ft_putstr(RED"XML : Error count argument "COLOR_OFF);
 		ft_putendl(str);
-		ft_del_split(&split, NULL, NULL);
+		ft_del_split(&split, NULL, NULL, count);
 		return (NULL);
 	}
 	return (split);
@@ -112,6 +116,8 @@ int		ft_get_3param(int i, const char *str, cl_double3 *dot, \
 		n++;
 	}
 	if ((split = ft_is_good_param(str, i)) != NULL)
-		return (ft_del_split(&split, dot, one_dot));
+		return (ft_del_split(&split, dot, one_dot, i));
 	return (0);
 }
+
+
