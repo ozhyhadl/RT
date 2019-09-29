@@ -1,4 +1,4 @@
-#include "kernel.h"
+#include "kernel.hh"
 
 double3	trim_color(double3 color)
 {

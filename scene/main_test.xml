@@ -1,51 +1,137 @@
 <?xml version="1.0" encoding="utf-8"?>
 !-- This is a comment
-	RT		: width, heigth.
-	spher	: centre, radius, RGB, transparency, reflective, specular, texture, bump, cutting, cut_dot, cut_normal, rotation, transp_map_no, ior.
-	plane	: dot, normal, RGB, transparency, reflective, specular, texture, bump, cutting, cut_dot, cut_normal, rotation, transp_map_no, ior.
-	cylin	: dot, dir, RGB, transparency, reflective, specular, texture, bump, mmin, mmax, cutting, cut_dot, cut_normal, rotation, transp_map_no, ior.
-	cone	: vertex, dir, angle, RGB, transparency, reflective, specular, texture, bump, mmin, mmax, cutting, cut_dot, cut_normal, rotation, transp_map_no, ior.
-	light	: type, position, intensity.
-	cam		: position.
---
-<RT width = "1200" heigth = "1200">
-	<spher>
-		<centre>1 2 3</centre>
-		<specular> 500</specular>
-		<transparency> 0 </transparency>
-		<reflective> 0 </reflective>
+	RT			: width, heigth.
 
-	</spher>
-	<cylin>
-		<dot>10 2 0</dot>
-		<dir>0 0 1</dir>
-		<RGB>0 255 0</RGB>
-		<texture> -1 </texture>
-		<bump> -1 </bump>
-	</cylin>
-	<cone>
-		<vertex>0 1 5</vertex>
-		<angle> 30 </angle>
-		<reflective>0.4</reflective>
-		<transparency>0.8</transparency>
-	</cone>
-	<plane> 
-		<dot>10 0 0 </dot>
-		<RGB>83 83 83</RGB>
-		<reflective> 0 </reflective>
-		<normal>0 1 0</normal>
-		<transparency> 0</transparency>
+	spher			: centre, radius.
+	plane			: dot, normal.
+	cylin			: dot, dir, radius, mmin, mmax.
+	cone			: vertex, dir, angle, mmin, mmax.
+	rectangle		: v0, v1, v2, v3.
+	triangle		: v0, v1, v2.
+	disk			: centre, normal, radius.
+	ellipse			: centre, dir, distance, radius.
+	cube			: centre, distance, cub_rotation.
+	negative_spher	: centre, radius.
+	for all obj		: RGB, transparency, reflective, specular, texture, move_dir, noise,
+					bump, cutting, cut_dot, cut_normal, rotation, transp_map_no, ior, txt_offset, txt_scale.
+	light			: type(point, ambient, direct), position, intensity.
+	cam				: position, dir.
+--
+<RT width = "1200" heigth = "700">
+	<plane>
+		<dot>0 -5 0</dot>
+		<RGB> 123 123 123 </RGB>
+		<normal>0 1 0 </normal>
 	</plane>
+	<plane>
+		<dot>0 6 0</dot>
+		<RGB> 123 123 123 </RGB>
+		<normal>0 -1 0 </normal>
+	</plane>
+	<plane>
+		<dot>0 0 50</dot>
+		<RGB> 60 62 237 </RGB>
+		<normal>0 0 1 </normal>
+	</plane>
+	<cylin>
+		<specular>1000</specular>
+		<dot>-5 0 0</dot>
+		<RGB>163 163 163</RGB>
+		<dir>0 1 0</dir>
+		<radius>1</radius>
+	</cylin>
+	<cylin>
+		<specular>1000</specular>
+		<dot>-5 0 15</dot>
+		<RGB>163 163 163</RGB>
+		<dir>0 1 0</dir>
+		<radius>1</radius>
+	</cylin>
+	<cylin>
+		<specular>1000</specular>
+		<dot>5 0 15</dot>
+		<RGB>163 163 163</RGB>
+		<dir>0 1 0</dir>
+		<radius>1</radius>
+	</cylin>
+	<cylin>
+		<specular>1000</specular>
+		<dot>5 0 0</dot>
+		<RGB>163 163 163</RGB>
+		<dir>0 1 0</dir>
+		<radius>1</radius>
+	</cylin>
+
+	<spher>
+		<specular>1000</specular>
+		<centre>-5 6 0</centre>
+		<RGB>163 163 163</RGB>
+		<radius>2</radius>
+	</spher>
+	<spher>
+		<specular>1000</specular>
+		<centre>-5 -5 0</centre>
+		<RGB>163 163 163</RGB>
+		<radius>2</radius>
+	</spher>
+	<spher>
+		<specular>1000</specular>
+		<centre>5 6 0</centre>
+		<RGB>163 163 163</RGB>
+		<radius>2</radius>
+	</spher>
+	<spher>
+		<specular>1000</specular>
+		<centre>5 -5 0</centre>
+		<RGB>163 163 163</RGB>
+		<radius>2</radius>
+	</spher>
+	<spher>
+		<specular>1000</specular>
+		<centre>5 6 15</centre>
+		<RGB>163 163 163</RGB>
+		<radius>2</radius>
+	</spher>
+	<spher>
+		<specular>1000</specular>
+		<centre>5 -5 15</centre>
+		<RGB>163 163 163</RGB>
+		<radius>2</radius>
+	</spher>
+	<spher>
+		<specular>1000</specular>
+		<centre>-5 6 15</centre>
+		<RGB>163 163 163</RGB>
+		<radius>2</radius>
+	</spher>
+	<spher>
+		<specular>1000</specular>
+		<centre>-5 -5 15</centre>
+		<RGB>163 163 163</RGB>
+		<radius>2</radius>
+	</spher>
+	<spher>
+		<specular>1000</specular>
+		<centre>0 -3 0</centre>
+		<RGB>163 0 0</RGB>
+		<radius>1</radius>
+	</spher>
+
 	<light>
-		<type> point </type>
-		<position> 0 1 -4 </position>
-		<intensity> 4 4 4 </intensity>
+		<type>point</type>
+		<position>-15 3 -20</position>
+		<intensity>10 10 10</intensity>
 	</light>
 	<light>
-		<type> ambient </type>
-		<intensity> 0.1 0.1 0.1 </intensity>
+		<type>point</type>
+		<position>15 3 -20</position>
+		<intensity>10 10 10</intensity>
+	</light>
+	<light>
+		<type>ambient</type>
+		<intensity>0.2 0.2 0.2</intensity>
 	</light>
 	<cam>
-		<position> 0 1 -9 </position>
+		<position>0 0 -15</position>
 	</cam>
 </RT>

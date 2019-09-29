@@ -6,7 +6,7 @@
 /*   By: ozhyhadl <ozhyhadl@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/08/30 18:56:10 by ozhyhadl          #+#    #+#             */
-/*   Updated: 2019/09/11 17:06:29 by ozhyhadl         ###   ########.fr       */
+/*   Updated: 2019/09/27 18:51:29 by ozhyhadl         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ int			ft_add_type_light(t_scene *scene, int l, char *str)
 		if (ft_is_space(str[i]))
 			i++;
 		else
-		str[n++] = (char)str[i++];
+			str[n++] = (char)str[i++];
 	}
 	str[n] = str[i];
 	if (ft_strequ(str, "point"))

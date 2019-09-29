@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   output.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: apavlov <apavlov@student.unit.ua>          +#+  +:+       +#+        */
+/*   By: apavlov <apavlov@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/08/19 15:18:16 by apavlov           #+#    #+#             */
-/*   Updated: 2019/08/19 15:18:16 by apavlov          ###   ########.fr       */
+/*   Updated: 2019/09/27 17:09:47 by apavlov          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ int		error_message(char *mess)
 int		print_usage(void)
 {
 	ft_putendl(GREEN"Hey boy, to run this program you should \
-use :\n"CYAN"./RT\tor\t./RT scene/<scene>"COLOR_OFF);
+use :\n"CYAN"./RT <scene>\nMost of the scenes you can \
+find in folder named \"scene\""COLOR_OFF);
 	return (1);
 }

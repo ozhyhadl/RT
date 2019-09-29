@@ -6,7 +6,7 @@
 /*   By: ozhyhadl <ozhyhadl@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/12 22:14:38 by ozhyhadl          #+#    #+#             */
-/*   Updated: 2019/09/12 22:15:37 by ozhyhadl         ###   ########.fr       */
+/*   Updated: 2019/09/28 15:33:17 by ozhyhadl         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,4 +37,14 @@ void	ft_write_cam(t_pov pov, mxml_node_t *data)
 
 	node = mxmlNewElement(data, "cam");
 	ft_write_3param(pov.coord, node, (const char *)"position");
+	ft_write_3param(pov.dir, node, (const char *)"dir");
+}
+
+void	ft_write_neg(t_negative_fig neg, mxml_node_t *data)
+{
+	mxml_node_t *node;
+
+	node = mxmlNewElement(data, "negative_spher");
+	ft_write_3param(neg.shape.sphere.cent, node, (const char *)"centre");
+	ft_write_param(neg.shape.sphere.radius, node, (const char *)"radius");
 }

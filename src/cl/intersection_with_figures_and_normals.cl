@@ -1,4 +1,4 @@
-#include "kernel.h"
+#include "kernel.hh"
 
 double2	intersect_triangle(double3 eye, double3 dir, t_triangle_data triangle)
 {
@@ -146,11 +146,33 @@ double2	intersect_cone(double3 eye, double3 dir, t_cone_data cone)
 	return(roots);
 }
 
+double2	intersect_ellipse(double3 eye, double3 dir, t_ellipse_data ellipse)
+{
+	double	k = ellipse.dist_btwn_cent;
+	double	r2 = ellipse.radius_sum * ellipse.radius_sum;
+
+	double3	oc = eye - ellipse.cent;
+	double	a1 = 2 * k * dot(dir, ellipse.dir);
+	double	a2 = r2 + 2 * k * dot(oc, ellipse.dir) - k;
+	double	a = 4 * r2 * dot(dir, dir) - a1 * a1;
+	double	b = 4 * r2 * dot(dir, oc) - a1 * a2;
+	double	c = 4 * r2 * dot(oc, oc) - a2 * a2;
+
+	double d = b * b - a * c;
+	if (d < 0)
+		return (-BIG_VALUE);
+	d = sqrt(d);
+	return ((double2)((-b + d),(-b - d))) / a;
+}
+
 double3	calculate_normal(t_fig fig, double3 intersect_point, t_raytrace_tree curr_node)
 {
 	double3		tmp;//dot - intersect.point
 	double3		tmp_2;
+	double		tmp_3;
 	double3		normal;
+	double		b;
+	double		a;
 
 	switch (fig.fig_type)
 	{
@@ -181,6 +203,14 @@ double3	calculate_normal(t_fig fig, double3 intersect_point, t_raytrace_tree cur
 			tmp = fig.shape.rectangle.v0 - fig.shape.rectangle.v1;
 			tmp_2 = fig.shape.rectangle.v0 - fig.shape.rectangle.v2;
 			normal = normalize(cross(tmp, tmp_2));
+			break ;
+		case ELLIPSE:
+			tmp = fig.shape.ellipse.cent + fig.shape.ellipse.dir * fig.shape.ellipse.dist_btwn_cent / 2;
+			tmp_2 = intersect_point - tmp;
+			tmp_3 = fig.shape.ellipse.dist_btwn_cent * fig.shape.ellipse.dist_btwn_cent / 4; //c ^ 2
+			b = fig.shape.ellipse.radius_sum * fig.shape.ellipse.radius_sum / 4 - tmp_3;
+			a = tmp_3 + b;
+			normal = normalize(tmp_2 - fig.shape.ellipse.dir * (1 - b / a) * dot(tmp_2, fig.shape.ellipse.dir));
 			break ;
 	}
 	if (fig.fig_type == PLANE || fig.fig_type == DISK || fig.fig_type == RECTANGLE || fig.fig_type == TRIANGLE)
@@ -321,7 +351,7 @@ double2		cut_result_with_negative_obj(double2 prev, __global t_scene *scene, dou
 				prev = cut_with_plane(prev, intersect_point, scene->neg_obj[i].shape.plane);
 			break;
 			case CYLIN:
-				//prev = cut_with_cylin(prev, intersect_point, scene->neg_obj[i].shape.cylin);
+				prev = cut_with_cylin(prev, intersect_point, scene->neg_obj[i]);
 			break;
 			default:
 			break;
@@ -384,13 +414,13 @@ t_obj_and_dist		check_closest_inter(double3 eye, double3 dir, \
 			case TRIANGLE:	res = intersect_triangle(eye, dir, fig.shape.triangle);		break;
 			case DISK:		res = intersect_disk(eye, dir, fig.shape.disk);				break;
 			case RECTANGLE:	res = intersect_rectangle(eye, dir, fig.shape.rectangle);	break;
-			//case ELLIPSE:	res = intersect_ellipse(eye, dir, fig.shape.ellipse);		break;
+			case ELLIPSE:	res = intersect_ellipse(eye, dir, fig.shape.ellipse);		break;
 			//case TORUS:		torus_res =  intersect_torus(eye, dir, fig, ...))		break;
 		}
 
 		if (fig.fig_type == TORUS)
 		{
-			cut_4_roots(eye, dir, torus_res, scene, \
+			//cut_4_roots(eye, dir, torus_res, scene, \
 					&closest_obj, &closest_dist, mini, maxi, fig, i);
 		}
 		else

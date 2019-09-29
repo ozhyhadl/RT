@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   parse.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: apavlov <apavlov@student.42.fr>            +#+  +:+       +#+        */
+/*   By: yruda <yruda@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/08/29 15:31:31 by apavlov           #+#    #+#             */
-/*   Updated: 2019/09/12 14:22:39 by apavlov          ###   ########.fr       */
+/*   Updated: 2019/09/27 21:46:32 by yruda            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PARSE_H
 # define PARSE_H
 
-# include "rt.h" 
+# include "rt.h"
 
 # define BUFFER_SIZE 200
 # define COUNT_CL_FILES 6

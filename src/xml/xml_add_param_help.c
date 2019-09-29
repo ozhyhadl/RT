@@ -6,7 +6,7 @@
 /*   By: ozhyhadl <ozhyhadl@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/08/30 18:30:23 by ozhyhadl          #+#    #+#             */
-/*   Updated: 2019/09/24 04:39:25 by ozhyhadl         ###   ########.fr       */
+/*   Updated: 2019/09/27 19:27:51 by ozhyhadl         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,19 +42,21 @@ double	str_to_double(char *line)
 	dot_pos++;
 	int_part = ft_atoi(line);
 	float_part = (dot_pos != line_len) ? ft_atoi(line + dot_pos) : 0;
-	res = int_part + (double)float_part / (pow(10, count_num(float_part)));
+	while (line[line_len - 1] < '0' || line[line_len] > '9')
+		line_len--;
+	res = int_part + (double)float_part / (pow(10, line_len - dot_pos));
 	if (res > 0 && res < 1 && line[0] == '-')
 		res *= -1;
 	return (res);
 }
 
-int		ft_del_split(char ***split, cl_double3 *dot, cl_double *one_dot, int count)
+int		ft_del_split(char ***split, cl_double3 *dot, cl_double \
+		*one_dot, int count)
 {
 	int i;
 
-
 	if (dot != NULL && *split != NULL && count == 2)
-	*dot = (cl_double3){{str_to_double((*split)[0]), \
+		*dot = (cl_double3){{str_to_double((*split)[0]), \
 		str_to_double((*split)[1]), 0}};
 	else if (dot != NULL && *split != NULL)
 		*dot = (cl_double3){{str_to_double((*split)[0]), \
@@ -110,7 +112,7 @@ int		ft_get_3param(int i, const char *str, cl_double3 *dot, \
 	{
 		if (str[n] == '\n' || str[n] == '\t')
 		{
-			ft_putendl(RED"XML : Only space between paramrams"COLOR_OFF);
+			ft_putendl(RED"XML : Only space between params"COLOR_OFF);
 			return (0);
 		}
 		n++;
@@ -119,5 +121,3 @@ int		ft_get_3param(int i, const char *str, cl_double3 *dot, \
 		return (ft_del_split(&split, dot, one_dot, i));
 	return (0);
 }
-
-

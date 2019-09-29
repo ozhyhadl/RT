@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+!-- This is a comment
+	RT			: width, heigth.
+
+	spher			: centre, radius.
+	plane			: dot, normal.
+	cylin			: dot, dir, radius, mmin, mmax.
+	cone			: vertex, dir, angle, mmin, mmax.
+	rectangle		: v0, v1, v2, v3.
+	triangle		: v0, v1, v2.
+	disk			: centre, normal, radius.
+	ellipse			: centre, dir, distance, radius.
+	cube			: centre, distance, cub_rotation.
+	negative_spher	: centre, radius.
+	for all obj		: RGB, transparency, reflective, specular, texture, move_dir, noise,
+					bump, cutting, cut_dot, cut_normal, rotation, transp_map_no, ior, txt_offset, txt_scale.
+	light			: type(point, ambient, direct), position, intensity.
+	cam				: position, dir.
+--
+<RT width = "1000" heigth = "1000">
+	<plane>
+		<dot>1 -1 10</dot>
+		<normal>0 1 0</normal>
+		<RGB> 164 90 82 </RGB>
+		<bump> 2</bump>
+		<reflective>0.1</reflective>
+		<txt_scale>0.5 0.5 </txt_scale>
+	</plane>
+	<spher>
+		<RGB> 93 20 81 </RGB>
+		<radius>1</radius>
+		<centre>6.3 -0.1 0.5</centre>
+		<reflective>0.1</reflective>
+		<specular>1000</specular>
+	</spher>
+	<spher>
+		<RGB> 93 20 81 </RGB>
+		<radius>1</radius>
+		<centre>7.9 -0.3 0.5</centre>
+		<reflective>0.1</reflective>
+		<specular>1000</specular>
+	</spher>
+	<spher>
+		<RGB> 93 20 81 </RGB>
+		<radius>1</radius>
+		<centre>5.1 1.1 0.5</centre>
+		<reflective>0.1</reflective>
+		<specular>1000</specular>
+	</spher>
+	<spher>
+		<RGB> 93 20 81 </RGB>
+		<radius>1</radius>
+		<centre>4.4 0 0.5</centre>
+		<reflective>0.1</reflective>
+		<specular>1000</specular>
+	</spher>
+	<spher>
+		<RGB> 93 20 81 </RGB>
+		<radius>1</radius>
+		<centre>2.6 0.1 0.5</centre>
+		<reflective>0.1</reflective>
+		 <specular>1000</specular>
+	</spher>
+	<spher>
+		<RGB> 93 20 81 </RGB>
+		<radius>1</radius>
+		<centre>3.6 1.6 0.5</centre>
+		<reflective>0.1</reflective>
+		 <specular>1000</specular>
+	</spher>
+
+	<light>
+		<type> point </type>
+		<position> 2 10 -4 </position>
+		<intensity> 10 10 10 </intensity>
+	</light>
+
+
+
+
+	<cam>
+		<position> 0 5 -30</position>
+	</cam>
+</RT>

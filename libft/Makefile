@@ -1,14 +1,14 @@
-#******************************************************************************#
+# **************************************************************************** #
 #                                                                              #
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: apavlov <apavlov@student.unit.ua>          +#+  +:+       +#+         #
+#    By: yruda <yruda@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/10/26 14:21:15 by apavlov           #+#    #+#              #
-#    Updated: 2018/11/07 19:46:43 by apavlov          ###   ########.fr        #
+#    Updated: 2019/09/25 14:05:46 by yruda            ###   ########.fr        #
 #                                                                              #
-#******************************************************************************#
+# **************************************************************************** #
 
 CC = gcc
 
@@ -92,7 +92,8 @@ SRC = 	ft_atoi.c \
 		comp_real.c \
 		ft_float_abs.c \
 
-OBJ = $(addprefix $(OBJ_DIR), $(SRC:.c=.o))
+OBJ = 			$(addprefix $(OBJ_DIR), $(SRC:.c=.o))
+DELETE_PREV =	"\x1b[A\x1b[K"
 
 all: obj_dir $(NAME)
 
@@ -100,10 +101,11 @@ obj_dir:
 	@mkdir -p $(OBJ_DIR)
 
 $(NAME): $(OBJ)
-	ar rc $(NAME) $(OBJ)
+	@ar rc $(NAME) $(OBJ)
 
 $(OBJ_DIR)%.o:$(SRC_DIR)%.c $(INC)
-	$(CC) $(FLAGS) $(INCLUDES) -o $@ -c $<
+	@$(CC) $(FLAGS) $(INCLUDES) -o $@ -c $<
+	@echo $(DELETE_PREV) "\x1b[36m\b" created: "\x1b[97;46m" $(@:%=%) "\x1b[0m" 
 
 clean:
 	@rm -f $(OBJ)

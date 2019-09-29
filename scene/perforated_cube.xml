@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+!-- This is a comment
+	RT			: width, heigth.
+
+	spher			: centre, radius.
+	plane			: dot, normal.
+	cylin			: dot, dir, radius, mmin, mmax.
+	cone			: vertex, dir, angle, mmin, mmax.
+	rectangle		: v0, v1, v2, v3.
+	triangle		: v0, v1, v2.
+	disk			: centre, normal, radius.
+	ellipse			: centre, dir, distance, radius.
+	cube			: centre, distance, cub_rotation.
+	negative_spher	: centre, radius.
+	for all obj		: RGB, transparency, reflective, specular, texture, move_dir, noise,
+					bump, cutting, cut_dot, cut_normal, rotation, transp_map_no, ior, txt_offset, txt_scale.
+	light			: type(point, ambient, direct), position, intensity.
+	cam				: position, dir.
+--
+<RT width = "1000" heigth = "1000">
+	<plane>
+		<dot>1 -0.5 10</dot>
+		<normal>0 0 1</normal>
+		<RGB> 127 255 212 </RGB>
+	</plane>
+	<cube>
+		<RGB> 250 128 114 </RGB>
+		<centre>1 -0.5 0.5</centre>
+		<transparency>0.5</transparency>
+		<transp_map_no>8</transp_map_no>
+		<txt_scale>0.6 0.6</txt_scale>
+		<ior>1.1</ior>
+	</cube>
+	<spher>
+		<RGB> 255 255 255 </RGB>
+		<radius>1</radius>
+		<centre>1 -0.5 0.5</centre>
+		<transparency>0.7</transparency>
+	</spher>
+	<light>
+	</light>
+	<light>
+		<type> point </type>
+		<position> 5 -4 1 </position>
+		<intensity> 2 2 2 </intensity>
+	</light>
+	<light>
+		<type> point </type>
+		<position> -5 0 9 </position>
+		<intensity> 2 2 2 </intensity>
+	</light>
+	<light>
+		<type> ambient </type>
+		<intensity> 0.2 0.1 0.1 </intensity>
+	</light>
+
+	<cam>
+		<position>3.9 -1.4 -5.6</position>
+		<dir>-0.4 0.5 0.8</dir>
+	</cam>
+</RT>

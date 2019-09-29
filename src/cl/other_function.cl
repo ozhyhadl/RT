@@ -1,6 +1,4 @@
-#include "kernel.h"
-
-
+#include "kernel.hh"
 
 void	swap(double* a, double*b)
 {
@@ -47,21 +45,4 @@ double3		rotate_z(double3 v, double angle)
 	v[0] = x * c - s * v[1];
 	v[1] = x * s + c * v[1];
 	return (v);
-}
-
-double3	rotate_camera(double3 direction, t_pov pov)
-{
-	double new_x;
-	double new_y;
-	double new_z;
-
-	new_x = direction[0] * pov.cy + direction[2] * pov.sy;
-	new_z = -direction[0] * pov.sy + direction[2] * pov.cy;
-	direction[0] = new_x;
-	direction[2] = new_z;
-	new_y = direction[1] * pov.cx + direction[2] * pov.sx;
-	new_z = -direction[1] * pov.sx + direction[2] * pov.cx;
-	direction[1] = new_y;
-	direction[2] = new_z;
-	return (direction);
 }
